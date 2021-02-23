@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -27,8 +29,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  * project.
  */
 public class Robot extends TimedRobot {
-    private static final String kDefaultAuto = "Default";
-    private static final String kCustomAuto = "My Auto";
+    private static final String AUTORUN = "AutoRun";
+    private static final String AUTOSHOOT = "AutoShoot";
+
+    private Command autonomousCommand;
+
 
     private HoloTable holo = HoloTable.getInstance();
     private ShootingTable shTable = ShootingTable.getInstance();
@@ -81,13 +86,13 @@ public class Robot extends TimedRobot {
         netInst = NetworkTableInstance.getDefault();
         table = netInst.getTable("datatable");
         lidarDist = table.getEntry("distance");
-        m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-        m_chooser.addOption("My Auto", kCustomAuto);
+        m_chooser.addOption("Auto Shoot", "Shoot");
+        m_chooser.setDefaultOption("Auto Nav 1", "Run Auto Nav 1");
         SmartDashboard.putData("Auto choices", m_chooser);
 
 
         kP = 0;
-        //kP = 6e-5;
+       // kP = 6e-5;
         kI = 0;
         kD = 0;
         kIz = 0;
@@ -104,6 +109,38 @@ public class Robot extends TimedRobot {
         buttonX = new JoystickButton(gamepad1, 3);
 
         // set PID coefficients
+
+        //Autonomous variables
+
+        holo.frontLeftPID.setP(Robot.kP);
+        holo.rearLeftPID.setP(Robot.kP);
+        holo.frontRightPID.setP(Robot.kP);
+        holo.rearRightPID.setP(Robot.kP);
+  
+        holo.frontLeftPID.setI(Robot.kI);
+        holo.rearLeftPID.setI(Robot.kI);
+        holo.frontRightPID.setI(Robot.kI);
+        holo.rearRightPID.setI(Robot.kI);
+  
+        holo.frontLeftPID.setD(Robot.kD);
+        holo.rearLeftPID.setD(Robot.kD);
+        holo.frontRightPID.setD(Robot.kD);
+        holo.rearRightPID.setD(Robot.kD);
+  
+        holo.frontLeftPID.setIZone(Robot.kIz);
+        holo.rearLeftPID.setIZone(Robot.kIz);
+        holo.frontRightPID.setIZone(Robot.kIz);
+        holo.rearRightPID.setIZone(Robot.kIz);
+  
+        holo.frontLeftPID.setFF(Robot.kFF);
+        holo.rearLeftPID.setFF(Robot.kFF);
+        holo.frontRightPID.setFF(Robot.kFF);
+        holo.rearRightPID.setFF(Robot.kFF);
+          
+        holo.frontLeftPID.setOutputRange(Robot.kMinOutput, Robot.kMaxOutput);
+        holo.rearLeftPID.setOutputRange(Robot.kMinOutput, Robot.kMaxOutput);
+        holo.frontRightPID.setOutputRange(Robot.kMinOutput, Robot.kMaxOutput);
+        holo.rearRightPID.setOutputRange(Robot.kMinOutput, Robot.kMaxOutput);
         /*
          * holo.bottomPID.setP(kP); holo.bottomPID.setI(kI); holo.bottomPID.setD(kD);
          * holo.bottomPID.setIZone(kIz); holo.bottomPID.setFF(kFF);
@@ -157,8 +194,23 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         m_autoSelected = m_chooser.getSelected();
-        // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+
+        m_autoSelected = SmartDashboard.getString("Auto Selector", m_autoSelected);
+        
+        autonomousCommand =new AutoPath();
         System.out.println("Auto selected: " + m_autoSelected);
+        switch (m_autoSelected) {
+            case "Shoot":
+                autonomousCommand =new AutoRunAndShoot();
+                break;
+            case "Run Auto Nav 1":
+            default:
+                autonomousCommand =new AutoPath();
+                break;
+            
+        }
+
+        if (autonomousCommand != null) autonomousCommand.start();
     }
 
     /**
@@ -166,15 +218,9 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
-        switch (m_autoSelected) {
-            case kCustomAuto:
-                // Put custom auto code here
-                break;
-            case kDefaultAuto:
-            default:
-                // Put default auto code here
-                break;
-        }
+        
+        Scheduler.getInstance().run();
+
     }
 
     /**

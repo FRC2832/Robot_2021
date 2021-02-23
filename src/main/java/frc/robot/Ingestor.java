@@ -17,9 +17,9 @@ public class Ingestor {
 
     public void runIngestor() {
         if (joystick.getPOV() == 180) {
-            intake.set(0.75);
+            intake.set(0.9);
         } else if (joystick.getPOV() == 0) {
-            intake.set(-0.75);
+            intake.set(-0.9);
         } else {
             intake.set(0.0);
         }

@@ -37,6 +37,13 @@ public final class HoloTable {
 
     public CANPIDController topPID;
     public CANPIDController bottomPID;
+
+
+    public CANPIDController frontLeftPID;
+    public CANPIDController frontRightPID;
+    public CANPIDController rearLeftPID;
+    public CANPIDController rearRightPID;
+    
     private static XboxController controller;
     private static Joystick joystickLeft;
     private static Joystick joystickRight;
@@ -75,15 +82,26 @@ public final class HoloTable {
         shooterBottom = new CANSparkMax(12, MotorType.kBrushless);
         topPID = shooterTop.getPIDController();
         bottomPID = shooterBottom.getPIDController();
+
+        
+        topPID = shooterTop.getPIDController();
+        bottomPID = shooterBottom.getPIDController();
         dropIntake = new DoubleSolenoid(0, 1);
         ejector = new WPI_TalonSRX(5);
         driveRightFront = new CANSparkMax(1, MotorType.kBrushless);
         driveLeftFront = new CANSparkMax(15, MotorType.kBrushless);// on comp, 14. On practice 15
         driveRightRear = new CANSparkMax(39, MotorType.kBrushless);
         driveLeftRear = new CANSparkMax(14, MotorType.kBrushless);// on comp, 15. On practice, 14
+
+        frontLeftPID = driveLeftFront.getPIDController();
+        frontRightPID = driveRightFront.getPIDController();
+        rearLeftPID = driveLeftRear.getPIDController();
+        rearRightPID= driveRightRear.getPIDController();
+
         controller = new XboxController(2);
         joystickLeft = new Joystick(0);
         joystickRight = new Joystick(1);
+
 
         table = NetworkTableInstance.getDefault().getTable("datatable");
     }

@@ -56,7 +56,14 @@ public class ShootingTable {
         System.out.println("Distance " + distance);
         System.out.println("CURRENT TABLE INDEX: " + (int)(((int) distance) - ( ((int)distance) % 24)));
         distanceSh = (int)(((int) distance) - ( ((int)distance) % 24));
-        return shootingTable.get(distanceSh);
+        double multiplier=0.85d;
+        try {
+            multiplier =shootingTable.get(distanceSh);
+        }catch (RuntimeException e){
+            //multiplier=0.9;
+        }
+
+        return multiplier;
     }
 
 }

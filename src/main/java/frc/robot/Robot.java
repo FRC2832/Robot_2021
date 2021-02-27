@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
-
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSink;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -15,8 +14,12 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -46,10 +49,13 @@ public class Robot extends TimedRobot {
     private static int visionCenterX = 640;
     private NetworkTableInstance netInst;
     private NetworkTable table;
+    private NetworkTable lidarTable;
     private final double[] defaultValue = { -1.0 };
     private boolean isCamValueUpdated;
     private XboxController gamepad1;
-    private NetworkTableEntry cameraSelect, centerXEntry;
+    private NetworkTableEntry cameraSelect, centerXEntry, lidarX, lidarY, lidarT, lidarAbsolute;
+    private static double initX,initY,initT;
+    private double currentX, currentY, currentT, c12x, c12y, c34x, c34y;
     // NetworkTableEntry cameraSelect =
     // NetworkTableInstance.getDefault().getEntry("/camselect");
 
@@ -70,6 +76,7 @@ public class Robot extends TimedRobot {
     private UsbCamera piCamera1;
     private UsbCamera piCamera2;
     private VideoSink server;
+    SequentialCommandGroup gridAuto;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -77,15 +84,31 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotInit() {
+        
         gamepad1 = new XboxController(2);
         netInst = NetworkTableInstance.getDefault();
         table = netInst.getTable("datatable");
         lidarDist = table.getEntry("distance");
+
+        lidarTable = netInst.getTable("lidar");
+        lidarX = lidarTable.getEntry("x");
+        lidarY = lidarTable.getEntry("y");
+        lidarT = lidarTable.getEntry("t");
+        lidarAbsolute = lidarTable.getEntry("absolute");
+
         m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
         m_chooser.addOption("My Auto", kCustomAuto);
         SmartDashboard.putData("Auto choices", m_chooser);
+        
+        
+        c12x = 2000;
+        c12y = 2000;
 
-
+        c34x = 4000;
+        c34y = 0;
+        initX = 0;
+        initY = 0;
+        initT = 0;
         kP = 0;
         //kP = 6e-5;
         kI = 0;
@@ -126,6 +149,7 @@ public class Robot extends TimedRobot {
         piCamera1 = CameraServer.getInstance().startAutomaticCapture(0);
         piCamera2 = CameraServer.getInstance().startAutomaticCapture(1);
         server = CameraServer.getInstance().getServer();
+        gridAuto = new GridAuto(driveTrain);
     }
 
     /**
@@ -139,7 +163,12 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        SmartDashboard.putNumber("Lidar Distance", (double) table.getEntry("distance0").getNumber(-1.0));
+        
+        //SmartDashboard.putNumber("Lidar Distance", (double) table.getEntry("distance0").getNumber(-1.0));
+        SmartDashboard.putNumber("Lidar X", ((double)lidarX.getNumber(-1) - initX));
+        SmartDashboard.putNumber("Lidar Y", ((double)lidarY.getNumber(-1) -initY));
+        SmartDashboard.putNumber("Lidar T", ((double)lidarT.getNumber(-1) - initT));
+        //SmartDashboard.putNumber("Lidar absolute", (double) lidarAbsolute.getNumber(-1.0));
     }
 
     /**
@@ -156,6 +185,12 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
+        CommandScheduler.getInstance().cancelAll();
+        gridAuto.schedule();
+        //new GridAuto(driveTrain);
+        //initX = ((double)lidarX.getNumber(-1));
+        //initY = ((double)lidarY.getNumber(-1));
+        //initT = ((double)lidarT.getNumber(-1));
         m_autoSelected = m_chooser.getSelected();
         // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
         System.out.println("Auto selected: " + m_autoSelected);
@@ -166,15 +201,78 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
-        switch (m_autoSelected) {
+        CommandScheduler.getInstance().run();
+
+        boolean command1 = true;
+        boolean command2 = false;
+        boolean command3 = false;
+        boolean command4 = false;
+        SmartDashboard.putNumber("Lidar X", ((double)lidarX.getNumber(-1) - initX));
+        SmartDashboard.putNumber("Lidar Y", ((double)lidarY.getNumber(-1) -initY));
+        SmartDashboard.putNumber("Lidar T", ((double)lidarT.getNumber(-1) - initT));
+        /*switch (m_autoSelected) {
             case kCustomAuto:
                 // Put custom auto code here
                 break;
             case kDefaultAuto:
             default:
+                
+                /*while(command1){
+                  driveTrain.driveSpeed(0,-0.35);
+                  if((((double)lidarT.getNumber(-1)) - initT) >= ((Math.toDegrees(Math.atan(c12y/c12x))))-5){ //Math.toDegrees(Math.atan(c1y/c1x)))
+                      driveTrain.driveSpeed(0,0);
+                     command1 = false;
+                     command2 = true;
+                 }
+                }
+                while(command2){
+                    driveTrain.driveSpeed(-0.5,0);
+                    if((((double)lidarX.getNumber(-1)) - initX) >= c12x){
+                        driveTrain.driveSpeed(0,0);
+                        command2 = false;
+                        command3 = true;
+                    }
+                }
+
+
+                while(command3){
+                    driveTrain.driveSpeed(0,0.35);
+                    if((((double)lidarT.getNumber(-1)) - initT) <= (-40)){ //Math.toDegrees(Math.atan(c1y/c1x)))
+                        driveTrain.driveSpeed(0,0);
+                       command3 = false;
+                       command4 = true;
+                   }
+                  }
+                  while(command4){
+                      driveTrain.driveSpeed(-0.5,0);
+                      if((((double)lidarX.getNumber(-1)) - initX) >= c34x){
+                          driveTrain.driveSpeed(0,0);
+                          command4 = false;
+                          //command3 = true;
+                      }
+                  }
+                
+                /*while(command2){
+                    driveTrain.driveSpeed(0,-0.25);
+                    if((((double)lidarT.getNumber(-1)) - initT) >= 90){
+                        driveTrain.driveSpeed(0,0);
+                        command2 = false;
+                        command3 = true;
+                    }
+                    
+                
+                
                 // Put default auto code here
-                break;
+                //lidar x y t boolean absolute
+                break;*/
         }
+    
+
+    public void teleopInit() {
+        // TODO Auto-generated method stub
+        initX = ((double)lidarX.getNumber(-1));
+        initY = ((double)lidarY.getNumber(-1));
+        initT = ((double)lidarT.getNumber(-1));
     }
 
     /**
@@ -182,6 +280,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopPeriodic() {
+
         ingestor.runIngestor();
 
             hopper.runMotors();
@@ -217,6 +316,19 @@ public class Robot extends TimedRobot {
     public void testPeriodic() {
 
     }
+
+    public static double getInitX(){
+        return initX;
+    }
+
+    public static double getInitY(){
+        return initY;
+    }
+
+    public static double getInitT(){
+        return initT;
+    }
+
 
     
 }

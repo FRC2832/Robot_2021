@@ -10,7 +10,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class TurnToCoords extends CommandBase {
+public class TurnTo180 extends CommandBase {
   double targetX, targetY;
   NetworkTable lidarTable;
   NetworkTableEntry lidarX, lidarY, lidarT;
@@ -19,10 +19,9 @@ public class TurnToCoords extends CommandBase {
   boolean finished = false;
   double targetAngle;
   int direction;
+
   /** Creates a new DriveToCoords. */
-  public TurnToCoords(DriveTrain driveTrain, double targetX, double targetY) {
-    this.targetX = targetX;
-    this.targetY = targetY;
+  public TurnTo180(DriveTrain driveTrain) {
     m_driveTrain = driveTrain;
     addRequirements(m_driveTrain);
   }
@@ -30,43 +29,25 @@ public class TurnToCoords extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
     m_driveTrain.driveSpeed(0,0);
-    System.out.println("TURNING TO: " + targetX + ", " + targetY);
     netInst = NetworkTableInstance.getDefault();
     lidarTable = netInst.getTable("lidar");
     lidarX = lidarTable.getEntry("x");
     lidarY = lidarTable.getEntry("y");
     lidarT = lidarTable.getEntry("t");
-    targetAngle = Math.toDegrees(Math.atan( (targetY - (double)lidarY.getNumber(-1))/(targetX - (double)lidarX.getNumber(-1))));
-    if((targetX - ((double)lidarX.getNumber(-1) - Robot.getInitX())) < 0){
-      targetAngle += 180;
-    }
-    if (targetAngle < 0)
-      direction = 1;
-    else
-      direction = -1;
+    targetAngle = 180;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     System.out.println("TARGET ANGLE: " + targetAngle);
-    System.out.println("TURNING TO: " + targetX + ", " + targetY);
-    m_driveTrain.driveSpeed(0,(direction * 0.375));
-
-    if(direction == -1){
-      if((((double)lidarT.getNumber(-1)) - Robot.getInitT()) >= (targetAngle-15.0)){ //Math.toDegrees(Math.atan(c1y/c1x)))
-        m_driveTrain.driveSpeed(0,0);
-        finished = true;
-      }
+    m_driveTrain.driveSpeed(0,(-0.375));
+    if((((double)lidarT.getNumber(-1)) - Robot.getInitT()) >= (targetAngle-15.0)){ //Math.toDegrees(Math.atan(c1y/c1x)))
+      m_driveTrain.driveSpeed(0,0);
+      finished = true;
     }
-    else{
-      if((((double)lidarT.getNumber(-1)) - Robot.getInitT()) <= (targetAngle+15.0)){ //Math.toDegrees(Math.atan(c1y/c1x)))
-        m_driveTrain.driveSpeed(0,0);
-        finished = true;
-       }
-    }
+    
   }
 
   // Called once the command ends or is interrupted.

@@ -16,19 +16,19 @@ public class GridAuto extends SequentialCommandGroup {
     m_driveTrain = driveTrain;
     System.out.print("STARTING COMMAND GROUP");
     addCommands(
-      
+    new TurnTo180(m_driveTrain),
+    new DriveToOrigin(m_driveTrain)
     //new TurnToCoords(driveTrain, 2000.0, 2000.0),
     //new DriveToCoords(driveTrain,2000.0, 2000.0),
     //new TurnToCoords(driveTrain,4000.0, 0.0),
     //new DriveToCoords(driveTrain,4000.0, 0.0),
     //new TurnToCoords(driveTrain, 2000.0, 2000.0),
     //new DriveToCoords(driveTrain,2000.0, 2000.0),
-    //new TurnToCoords(driveTrain, 4.0, 0.0),
-    //new DriveToCoords(driveTrain,4.0, 0.0),
-    new TurnToCoords(driveTrain, 2.0, 0.0),
-    new DriveToCoords(driveTrain,2.0, 0.0),
-    new TurnToCoordsSmall(driveTrain, 0.0, 0.0),
-    new DriveToCoords(driveTrain,0.0, 0.0)
+    //new TurnToCoords(driveTrain, 2000.0, 0.0),
+    //new DriveToCoords(driveTrain,2000.0, 0.0),
+
+    //new TurnToCoordsSmall(driveTrain, 0.0, 0.0),
+    //new DriveToCoords(driveTrain,0.0, 0.0)
     //new TurnToCoords(driveTrain,4000.0, 0.0),
     //new DriveToCoords(driveTrain,4000.0, 0.0)
     // Add your commands in the addCommands() call, e.g.

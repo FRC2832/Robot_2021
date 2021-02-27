@@ -13,11 +13,15 @@ public class AutoShoot extends Command {
      protected void execute() {
         holo.topPID.setReference(-(150.0), ControlType.kVelocity);
         holo.bottomPID.setReference(400.0, ControlType.kVelocity);
-     }
+        holo.getEjector().set(0.5);
+    }
  
     
      // Called once after isFinished returns true
      protected void end() {
+        holo.topPID.setReference(0, ControlType.kVelocity);
+        holo.bottomPID.setReference(0, ControlType.kVelocity);
+        holo.getEjector().set(0);
      }
  
      // Called when another command which requires one or more of the same

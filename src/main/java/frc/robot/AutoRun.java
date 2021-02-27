@@ -6,15 +6,19 @@ import edu.wpi.first.wpilibj.command.Command;
 
 
 public class AutoRun extends Command {
-    
+    private double rpm;
     private HoloTable holo = HoloTable.getInstance();
+
+    public AutoRun(double rpmspeed){
+        this.rpm=rpmspeed;
+    }
  
      // Called repeatedly when this Command is scheduled to run
      protected void execute() {
-        holo.frontLeftPID.setReference((AutoPath.rpm), ControlType.kVelocity);
-        holo.frontRightPID.setReference(-(AutoPath.rpm), ControlType.kVelocity);
-        holo.rearLeftPID.setReference((AutoPath.rpm), ControlType.kVelocity);
-        holo.rearRightPID.setReference(-(AutoPath.rpm), ControlType.kVelocity);
+        holo.frontLeftPID.setReference((rpm), ControlType.kVelocity);
+        holo.frontRightPID.setReference(-(rpm), ControlType.kVelocity);
+        holo.rearLeftPID.setReference((rpm), ControlType.kVelocity);
+        holo.rearRightPID.setReference(-(rpm), ControlType.kVelocity);
      }
  
     

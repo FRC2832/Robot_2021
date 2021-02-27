@@ -197,7 +197,6 @@ public class Robot extends TimedRobot {
 
         m_autoSelected = SmartDashboard.getString("Auto Selector", m_autoSelected);
         
-        autonomousCommand =new AutoPath();
         System.out.println("Auto selected: " + m_autoSelected);
         switch (m_autoSelected) {
             case "Shoot":

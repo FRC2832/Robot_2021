@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 
 public class AutoPath extends CommandGroup{
@@ -32,7 +33,9 @@ public class AutoPath extends CommandGroup{
         addSequential(new AutoRun(rpm), 100/speed);
         System.out.println("2222222222222 "+ calculateTimeBasedOnArcAngle(15*Math.PI/8,radius3)*speed);
         addSequential(new AutoCircle(1,r),305.0/speed);//426.36
-        addSequential(new AutoRun(rpm), 300/speed);//
+        //addSequential(new AutoRun(rpm), 300/speed);//
+        addSequential(new TurnTo180(Robot.driveTrain));//
+        addSequential(new DriveToOrigin(Robot.driveTrain));//
     }
     private double calculateTimeBasedOnArcAngle(double theta,double rad){
         double time =(rad+w)*(theta)/speed;

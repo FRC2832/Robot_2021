@@ -12,7 +12,7 @@ import math
 import cv2
 
 from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
-from networktables import NetworkTablesInstance
+from networktables import NetworkTablesInstance, NetworkTables
 from enum import Enum
 
 #   JSON format:
@@ -57,6 +57,7 @@ from enum import Enum
 #   }
 
 configFile = "/boot/frc.json"
+BlurType = Enum('BlurType', ["Box_Blur", "Gaussian_Blur", "Median_Filter", "Bilateral_Blur"])
 
 class CameraConfig: pass
 
@@ -76,22 +77,13 @@ class targetProc:
 
         self.hsv_threshold_output = None
 
-        self.__cv_erode_src = self.hsv_threshold_output
-        self.__cv_erode_kernel = None
-        self.__cv_erode_anchor = (-1, -1)
-        self.__cv_erode_iterations = 1
-        self.__cv_erode_bordertype = cv2.BORDER_CONSTANT
-        self.__cv_erode_bordervalue = (-1)
-
-        self.cv_erode_output = None
-
-        self.__blur_input = self.cv_erode_output
+        """self.__blur_input = self.hsv_threshold_output
         self.__blur_type = BlurType.Box_Blur
         self.__blur_radius = 6.306306306306306
 
         self.blur_output = None
-
-        self.__find_contours_input = self.blur_output
+        """
+        self.__find_contours_input = self.hsv_threshold_output
         self.__find_contours_external_only = False
 
         self.find_contours_output = None
@@ -124,16 +116,12 @@ class targetProc:
         self.__hsv_threshold_input = source0
         (self.hsv_threshold_output) = self.__hsv_threshold(self.__hsv_threshold_input, self.__hsv_threshold_hue, self.__hsv_threshold_saturation, self.__hsv_threshold_value)
 
-        # Step CV_erode0:
-        self.__cv_erode_src = self.hsv_threshold_output
-        (self.cv_erode_output) = self.__cv_erode(self.__cv_erode_src, self.__cv_erode_kernel, self.__cv_erode_anchor, self.__cv_erode_iterations, self.__cv_erode_bordertype, self.__cv_erode_bordervalue)
-
         # Step Blur0:
-        self.__blur_input = self.cv_erode_output
+        """self.__blur_input = self.hsv_threshold_output
         (self.blur_output) = self.__blur(self.__blur_input, self.__blur_type, self.__blur_radius)
-
+        """
         # Step Find_Contours0:
-        self.__find_contours_input = self.blur_output
+        self.__find_contours_input = self.hsv_threshold_output
         (self.find_contours_output) = self.__find_contours(self.__find_contours_input, self.__find_contours_external_only)
 
         # Step Filter_Contours0:
@@ -160,21 +148,6 @@ class targetProc:
         return cv2.inRange(out, (hue[0], sat[0], val[0]),  (hue[1], sat[1], val[1]))
 
     @staticmethod
-    def __cv_erode(src, kernel, anchor, iterations, border_type, border_value):
-        """Expands area of lower value in an image.
-        Args:
-           src: A numpy.ndarray.
-           kernel: The kernel for erosion. A numpy.ndarray.
-           iterations: the number of times to erode.
-           border_type: Opencv enum that represents a border type.
-           border_value: value to be used for a constant border.
-        Returns:
-            A numpy.ndarray after erosion.
-        """
-        return cv2.erode(src, kernel, anchor, iterations = (int) (iterations +0.5),
-                            borderType = border_type, borderValue = border_value)
-
-    @staticmethod
     def __blur(src, type, radius):
         """Softens an image using one of several filters.
         Args:
@@ -184,6 +157,7 @@ class targetProc:
         Returns:
             A numpy.ndarray that has been blurred.
         """
+        # cv2.drawContours(input, contours, -1,(255,0,0),5)
         if(type is BlurType.Box_Blur):
             ksize = int(2 * round(radius) + 1)
             return cv2.blur(src, (ksize, ksize))
@@ -205,11 +179,16 @@ class targetProc:
         Return:
             A list of numpy.ndarray where each one represents a contour.
         """
+    
+        
         if(external_only):
             mode = cv2.RETR_EXTERNAL
         else:
             mode = cv2.RETR_LIST
         method = cv2.CHAIN_APPROX_SIMPLE
+        im2, contours, hierarchy =cv2.findContours(input, mode=mode, method=method)
+        for cnt in contours:
+            cv2.drawContours(input,[cnt],0,(255,0,0),-1)
         im2, contours, hierarchy =cv2.findContours(input, mode=mode, method=method)
         return contours
 
@@ -271,8 +250,6 @@ class targetProc:
             output.append(cv2.convexHull(contour))
         return output
 
-BlurType = Enum('BlurType',"Box_Blur Gaussian_Blur Median_Blur Bilateral_Blur")
-
 #Ball vision
 class ballProc:
     """
@@ -297,7 +274,7 @@ class ballProc:
 
         self.hsv_threshold_output = None
 
-        self.__cv_erode_src = self.hsv_threshold_output
+        """self.__cv_erode_src = self.hsv_threshold_output
         self.__cv_erode_kernel = None
         self.__cv_erode_anchor = (-1, -1)
         self.__cv_erode_iterations = 1.0
@@ -305,9 +282,9 @@ class ballProc:
         self.__cv_erode_bordervalue = (-1)
 
         self.cv_erode_output = None
-
+        """
         self.__mask_input = self.cv_resize_output
-        self.__mask_mask = self.cv_erode_output
+        self.__mask_mask = self.hsv_threshold_output
 
         self.mask_output = None
 
@@ -332,12 +309,12 @@ class ballProc:
         (self.hsv_threshold_output) = self.__hsv_threshold(self.__hsv_threshold_input, self.__hsv_threshold_hue, self.__hsv_threshold_saturation, self.__hsv_threshold_value)
 
         # Step CV_erode0:
-        self.__cv_erode_src = self.hsv_threshold_output
+        """self.__cv_erode_src = self.hsv_threshold_output
         (self.cv_erode_output) = self.__cv_erode(self.__cv_erode_src, self.__cv_erode_kernel, self.__cv_erode_anchor, self.__cv_erode_iterations, self.__cv_erode_bordertype, self.__cv_erode_bordervalue)
-
+        """
         # Step Mask0:
         self.__mask_input = self.cv_resize_output
-        self.__mask_mask = self.cv_erode_output
+        self.__mask_mask = self.hsv_threshold_output
         (self.mask_output) = self.__mask(self.__mask_input, self.__mask_mask)
 
         # Step Find_Blobs0:
@@ -373,9 +350,9 @@ class ballProc:
         out = cv2.cvtColor(input, cv2.COLOR_BGR2HSV)
         return cv2.inRange(out, (hue[0], sat[0], val[0]),  (hue[1], sat[1], val[1]))
 
-    @staticmethod
+    """@staticmethod
     def __cv_erode(src, kernel, anchor, iterations, border_type, border_value):
-        """Expands area of lower value in an image.
+        """"""Expands area of lower value in an image.
         Args:
            src: A numpy.ndarray.
            kernel: The kernel for erosion. A numpy.ndarray.
@@ -384,10 +361,10 @@ class ballProc:
            border_value: value to be used for a constant border.
         Returns:
             A numpy.ndarray after erosion.
-        """
+        """"""
         return cv2.erode(src, kernel, anchor, iterations = (int) (iterations +0.5),
                             borderType = border_type, borderValue = border_value)
-
+        """
     @staticmethod
     def __mask(input, mask):
         """Filter out an area of an image using a binary mask.
@@ -425,35 +402,35 @@ class ballProc:
         detector = cv2.SimpleBlobDetector_create(params)
         return detector.detect(input)
     
-    def extra_target_processing(pipeline):
 
-        center_x_positions = []
-        widths = []
+def extra_target_processing(pipeline):
 
-        for contour in pipeline.filter_contours_output:
-            x, y, w, h = cv2.boundingRect(contour)
-            center_x_positions.append(x + w / 2)
-            widths.append(w)
-        print('center x', center_x_positions)
+    center_x_positions = []
+    widths = []
+    for contour in pipeline.filter_contours_output:
+        x, y, w, h = cv2.boundingRect(contour)
+        center_x_positions.append(x + w / 2)
+        widths.append(w)
+    print('center x', center_x_positions)
 
-        table = NetworkTables.getTable('datatable')
-        table.putNumberArray('targets', center_x_positions)
-        table.putNumberArray('w', widths)
+    table = NetworkTables.getTable('datatable')
+    table.putNumberArray('targets', center_x_positions)
+    table.putNumberArray('w', widths)
 
-    def extra_ball_processing(pipeline):
+def extra_ball_processing(pipeline):
 
-        center_x_positions = []
-        widths = []
+    center_x_positions = []
+    widths = []
 
-        for contour in pipeline.filter_contours_output:
-            x, y, w, h = cv2.boundingRect(contour)
-            center_x_positions.append(x + w / 2)
-            widths.append(w)
-        print('center x', center_x_positions)
+    for contour in pipeline.filter_contours_output:
+        x, y, w, h = cv2.boundingRect(contour)
+        center_x_positions.append(x + w / 2)
+        widths.append(w)
+    print('center x', center_x_positions)
 
-        table = NetworkTables.getTable('datatable')
-        table.putNumberArray('targets', center_x_positions)
-        table.putNumberArray('w', widths)
+    table = NetworkTables.getTable('datatable')
+    table.putNumberArray('targets', center_x_positions)
+    table.putNumberArray('w', widths)
 
 team = None
 server = False
@@ -598,6 +575,7 @@ def startSwitchedCamera(config):
                     server.setSource(cameras[i])
                     break
 
+
     NetworkTablesInstance.getDefault().getEntry(config.key).addListener(
         listener,
         NetworkTablesInstance.NotifyFlags.IMMEDIATE |
@@ -634,8 +612,8 @@ if __name__ == "__main__":
     for config in switchedCameraConfigs:
         startSwitchedCamera(config)
 
-    img1 = targetProc() #change
-    img2 = ballProc() #change
+    targetImage = targetProc() #change
+    ballImage = ballProc() #change
 
     # loop forever
 
@@ -648,13 +626,13 @@ if __name__ == "__main__":
         else:
             ret = None
         if ret:
-            img_proc.process(img1)
-            #extra_processing(img_proc)
+            targetImage.process(img1)
+            extra_target_processing(targetImage)
 
         if cvSinks[1] is not None:
             ret, img2 = cvSinks[1].grabFrame(img1)
         else:
             ret = None
         if ret:
-            img_proc.process(img2)
+            ballImage.process(img2)
             #extra_processing(other_proc)

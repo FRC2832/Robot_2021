@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-public final class Pi{
+public class Pi{
     HoloTable holo = HoloTable.getInstance();
 
     XboxController gamepad1;
@@ -23,16 +23,54 @@ public final class Pi{
     private NetworkTable table;
     private NetworkTableEntry cameraSelect;
     private boolean isButtonHeld;
+    private NetworkTableEntry targetEntry;
+    private static boolean turnLeft;
+    private static boolean turnRight;
 
+    private static final double X_RESOLUTION = 1280.0;
     Pi(){
         gamepad1 = holo.getController();
         netInst = NetworkTableInstance.getDefault();
         table = netInst.getTable("datatable");
         cameraSelect = netInst.getTable("SmartDashboard").getEntry("camNumber");
-        CameraServer.getInstance().addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
-        
+        targetEntry = table.getEntry("targets");
+        CameraServer.getInstance().addServer("10.28.32.11"); // I think this connects to the Raspberry Pi's CameraServer.
     }
 
+    public void processTargets() {
+        Number[] targetListAsNumbers = targetEntry.getNumberArray(new Number[0]);
+        if(targetListAsNumbers.length == 0) {
+            return;
+        }
+
+        double xVal = (double) targetListAsNumbers[0]; // get first targert in list
+        if(xVal <(0.5 * X_RESOLUTION) - 0.05 * X_RESOLUTION) {
+            turnLeft =true;
+            turnRight =false;
+        } else if(xVal > (0.5 * X_RESOLUTION) + 0.05 * X_RESOLUTION) {
+            turnLeft = false;
+            turnRight = true;
+        }else {
+            turnLeft = false;
+            turnRight= false;
+        }
+    }
+    public static boolean getTurnLeft() {
+        return turnLeft;
+    }
+
+    public static boolean getTurnRight(){
+        return turnRight;
+    }
+    public static boolean getTurnCentered(){
+        return !turnRight && !turnLeft;
+    }    
+
+
+
+
+
+    /*
     public void switchCameras(){
 
         if (gamepad1.getBButton()) {
@@ -50,6 +88,6 @@ public final class Pi{
         } else {
             isButtonHeld = false;
         }
-    }
+    }*/
 
 }

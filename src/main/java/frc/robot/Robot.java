@@ -177,6 +177,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         SmartDashboard.putNumber("Lidar Distance", (double) table.getEntry("distance0").getNumber(-1.0));
+        pi.processTargets();
     }
 
     /**
@@ -201,6 +202,9 @@ public class Robot extends TimedRobot {
         switch (m_autoSelected) {
             case "Shoot":
                 autonomousCommand =new AutoRunAndShoot();
+                break;
+            case "Camera Guided Shooting":
+                autonomousCommand = new CameraGuidedShooting();
                 break;
             case "Run Auto Nav 1":
             default:
@@ -239,7 +243,7 @@ public class Robot extends TimedRobot {
         }
 
         driveTrain.driveTank();
-        pi.switchCameras();
+        //pi.switchCameras();
 
       
         /*

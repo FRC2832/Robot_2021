@@ -28,7 +28,8 @@ public class AutoCircle extends Command {
  
      // Called repeatedly when this Command is scheduled to run
      protected void execute() {
-         if(direction==1){
+        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&    " + gyroangle);
+        if(direction==1){
             holo.frontRightPID.setReference(-(rpm), ControlType.kVelocity);
             holo.frontLeftPID.setReference( (rpm/(1 + width/radius) ), ControlType.kVelocity);
             holo.rearRightPID.setReference(-(rpm), ControlType.kVelocity);

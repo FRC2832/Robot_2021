@@ -2,7 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
-public class AutoPath extends CommandGroup{
+public class AutoNav1 extends CommandGroup{
     public double speed=51; //inches per second for linear speed of wheels
     public double rpm=speed/6/Math.PI*60*0.75;//rpm speed of motor // 0.75 is a multiplying factor found experimentally
     public double w=26.521; //inches distance between left and right wheels
@@ -11,14 +11,13 @@ public class AutoPath extends CommandGroup{
     private double v=60, h=90;
     public double angleOffset = 14;//12 degree delay from gyro. This may change with the speed and/or radius
 
-    public AutoPath(){
+    public AutoNav1(){
 
         addSequential(new AutoRun(rpm,1), 120/speed);//straight line distance to first cone is 106 inches
         //Robot starts above the marker in circle of radius radius and completes enough of arc until its align
         //with the internal tangent of the 2 circles around both markers
         double theta=Math.atan(h/v);
         double alpha=Math.acos((2*r + w)/Math.sqrt(v*v+h*h));//a is vertical distance between markers in inches
-        double time =(r+w)*(2*Math.PI+theta-alpha)/speed;
         double gyroangle = -(2*Math.PI+theta-alpha) * 180.0/Math.PI;
         addSequential(new AutoCircle(2,r, gyroangle, angleOffset, w, rpm), 45);
 
@@ -37,13 +36,8 @@ public class AutoPath extends CommandGroup{
         gyroangle += gyroAngleDisplacement;
         addSequential(new AutoCircle(1,r, gyroangle, angleOffset+1, w, rpm),45);
         
-        addSequential(new AutoRun(rpm,1), 3240/speed);//
+        addSequential(new AutoRun(rpm,1), 240/speed);//
         
-        //addSequential(new TurnTo180(Robot.driveTrain));//
-        //addSequential(new DriveToOrigin(Robot.driveTrain));//
     }
-    private double calculateTimeBasedOnArcAngle(double theta,double rad){
-        double time =(rad+w)*(theta)/speed;
-        return time;
-    }
+ 
 }

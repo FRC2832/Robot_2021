@@ -10,7 +10,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 
 public final class HoloTable {
@@ -45,8 +44,7 @@ public final class HoloTable {
     public CANPIDController rearRightPID;
     
     private static XboxController controller;
-    private static Joystick joystickLeft;
-    private static Joystick joystickRight;
+
     private static CANSparkMax climberTop;
     private static CANSparkMax climberBottom;
    
@@ -99,10 +97,7 @@ public final class HoloTable {
         rearRightPID= driveRightRear.getPIDController();
 
         controller = new XboxController(2);
-        joystickLeft = new Joystick(0);
-        joystickRight = new Joystick(1);
-
-
+      
         table = NetworkTableInstance.getDefault().getTable("datatable");
     }
 
@@ -145,15 +140,7 @@ public final class HoloTable {
         return controller;
     }
 
-    public Joystick getJoystickLeft() {
-        return joystickLeft;
-    }
-
-    public Joystick getJoystickRight() {
-        return joystickRight;
-    }
-
-    public WPI_TalonSRX getIntake() {
+      public WPI_TalonSRX getIntake() {
         return intake;
     }
 
@@ -212,6 +199,5 @@ public final class HoloTable {
         return climberBottom;
     }
 
-
-   
+    
 }

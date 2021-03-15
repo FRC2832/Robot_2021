@@ -6,6 +6,7 @@ import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
@@ -13,18 +14,15 @@ public class Shooter {
     HoloTable holo = HoloTable.getInstance();
     private ShootingTable shTable = ShootingTable.getInstance();
     public XboxController gamepad1 = holo.getController();
-    public Joystick joystick = holo.getJoystickRight();
     public WPI_TalonSRX ejector = holo.getEjector();
     public CANSparkMax rightRear = holo.getDriveRightRear();
     public CANSparkMax rightFront = holo.getDriveRightFront();
     public WPI_TalonSRX hopper = holo.getHopper();
-
+    
     private double mult = 1.0;
     private double shootSpeed = 1.0;
-    
+   
     public void runShooter() throws InterruptedException{
-
-
         // read PID coefficients from SmartDashboard
         double p = SmartDashboard.getNumber("P Gain", 0.0);
         double i = SmartDashboard.getNumber("I Gain", 0.0);
@@ -62,10 +60,10 @@ public class Shooter {
             Robot.kMaxOutput = max;
         }
        
-        if (joystick.getTrigger()) {
+        if (HoloTable.getInstance().getController().getBumper(Hand.kLeft)) {
             hopper.set(-0.5);
         }
-        if (joystick.getTriggerPressed()) {
+        if (HoloTable.getInstance().getController().getBumperPressed(Hand.kLeft)) {
             mult = shTable.getMultiplier(holo.getDistance0());
             shootSpeed = 255.0 * mult;
 
@@ -77,7 +75,7 @@ public class Shooter {
             //ejector.set(0.25);
            
         }
-        if (joystick.getTriggerReleased()) {
+        if (HoloTable.getInstance().getController().getBumperReleased(Hand.kLeft)) {
             Robot.setTop = 0;
             Robot.setBottom = 0;
 
@@ -87,12 +85,12 @@ public class Shooter {
             holo.bottomPID.setReference(0, ControlType.kVelocity);
 
         }
-        if (joystick.getRawButtonPressed(3)) {
+        if (HoloTable.getInstance().getController().getAButtonPressed()) {
             Robot.setTop = Robot.emptyTopRPM;
             Robot.setBottom = Robot.emptyBottomRPM;
             ejector.set(0.5);
         }
-        if (joystick.getRawButtonReleased(3)) {
+        if (HoloTable.getInstance().getController().getAButtonReleased()) {
             Robot.setTop = 0;
             Robot.setBottom = 0;
             ejector.set(0.0);

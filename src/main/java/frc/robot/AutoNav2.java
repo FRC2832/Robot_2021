@@ -45,6 +45,7 @@ public class AutoNav2 extends CommandGroup{
 
         gyroAngleDisplacement = 90;
         angle += gyroAngleDisplacement;
-        addSequential(new AutoCircle(1, r, angle, angleOffset, w, rpm), 45);        
+        addSequential(new AutoCircle(1, r, angle, angleOffset, w, rpm), 45);
+        addSequential(new AutoRun(rpm,1), 40/speed);        
     }
 }

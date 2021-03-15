@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import com.revrobotics.ControlType;
+
 
 public class AutoNav3 extends CommandGroup{
     public double speed=51; //inches per second for linear speed of wheels
@@ -22,20 +24,24 @@ public class AutoNav3 extends CommandGroup{
 
         addSequential(new AutoRun(rpm,1), bounce/speed);
         
+        resetSpeed();
+
         addSequential(new AutoRun(rpm,2), bounce/speed);
 
-        gyroAngleDisplacement = Math.atan(30/60)*180/Math.PI;//fixed constants
+        gyroAngleDisplacement = Math.atan(30.0/60)*180/Math.PI;//fixed constants
         angle += gyroAngleDisplacement;
-        addSequential(new AutoCircle(4, r, angle, angleOffset, w, rpm), 45);
+        addSequential(new AutoCircle(4, r, angle, angleOffset+2, w, rpm), 45);
 
-        double dist = Math.sqrt(30*30 + 60*60);//also fixed constants
+        double dist = Math.sqrt(30.0*30 + 60*60);//also fixed constants
         addSequential(new AutoRun(rpm,2), dist/speed);
 
-        gyroAngleDisplacement = 180 - Math.atan(30/60)*180/Math.PI;
+        gyroAngleDisplacement = 180 - Math.atan(30.0/60)*180/Math.PI;
         angle += gyroAngleDisplacement;
         addSequential(new AutoCircle(4, r, angle, angleOffset, w, rpm), 45);
 
         addSequential(new AutoRun(rpm,2), (60 + bounce)/speed);
+
+        resetSpeed();
         
         addSequential(new AutoRun(rpm,1), (60 + bounce)/speed);
 
@@ -51,6 +57,8 @@ public class AutoNav3 extends CommandGroup{
 
         addSequential(new AutoRun(rpm,1), (60 + bounce)/speed);
 
+        resetSpeed();
+
         addSequential(new AutoRun(rpm,2), bounce/speed);
 
         gyroAngleDisplacement = 90;//fixed constants
@@ -60,4 +68,13 @@ public class AutoNav3 extends CommandGroup{
         addSequential(new AutoRun(rpm,2), 30/speed);//midline of robot starts 30 inches behind the starting threshold
 
     }
+
+private HoloTable holo = HoloTable.getInstance();
+
+public void resetSpeed() {
+    holo.frontRightPID.setReference(-(0), ControlType.kVelocity);
+    holo.frontLeftPID.setReference( (0 ), ControlType.kVelocity);
+    holo.rearRightPID.setReference(-(0), ControlType.kVelocity);
+    holo.rearLeftPID.setReference( (0 ), ControlType.kVelocity);
+}
 }

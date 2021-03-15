@@ -256,7 +256,7 @@ public class Robot extends TimedRobot {
                 break;
             case "Run Auto Nav 1":
             default:
-                autonomousCommand =new AutoPath();
+                autonomousCommand =new AutoNav1();
                 break;
             
         }

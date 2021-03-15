@@ -7,34 +7,24 @@ package frc.robot;
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 public class DriveTrain extends SubsystemBase {
   private HoloTable holo = HoloTable.getInstance();
-  private WPI_TalonSRX driveTurn;
   private CANSparkMax leftFront;
   private CANSparkMax rightFront;
   private CANSparkMax leftRear;
   private CANSparkMax rightRear;
   private DifferentialDrive differentialDrive;
-  private PigeonIMU gyro;
   private XboxController controller;
-  //private DoubleSolenoid turnSolenoid;
   private SpeedControllerGroup leftMotors;
   private SpeedControllerGroup rightMotors;
-  private Joystick joystickLeft;
-  private Joystick joystickRight;
-  private int targetPixel = 640;
   private double driveCoeff;
   
 
@@ -42,16 +32,11 @@ public class DriveTrain extends SubsystemBase {
    * Creates a new DriveTrain.
    */
   public DriveTrain() {
-    driveTurn = holo.getDriveTurn();
     leftFront = holo.getDriveLeftFront();
     rightFront = holo.getDriveRightFront();
     leftRear = holo.getDriveLeftRear();
     rightRear = holo.getDriveRightRear();
-    gyro = holo.getGyro();
     controller = holo.getController();
-    joystickLeft = holo.getJoystickLeft();
-    joystickRight = holo.getJoystickRight();
-    //turnSolenoid = holo.getTurnSolenoid();
     leftMotors = new SpeedControllerGroup(leftFront, leftRear);
     leftMotors.setInverted(true);
     rightMotors = new SpeedControllerGroup(rightFront, rightRear);
@@ -66,51 +51,9 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void driveTank() {
-    if (joystickRight.getRawButton(2)){
-      driveCoeff = .3;
-    } else {
-      driveCoeff = 1;
-    }
-    differentialDrive.tankDrive(driveCoeff * Math.pow(joystickLeft.getY(), 1), driveCoeff * Math.pow(joystickRight.getY(), 1) , false);
+    differentialDrive.tankDrive(controller.getY(Hand.kLeft)*0.5, controller.getY(Hand.kRight)*0.5, false);
   }
-
   public void driveSpeed(double speed , double rotation){
     differentialDrive.arcadeDrive(speed, rotation);
   }
-
-  public void rotate(double rotateSpeed) {
-    //differentialDrive.arcadeDrive(0, rotateSpeed);
-  }
-  /*
-   * public void driveArcade() {
-   * differentialDrive.arcadeDrive(controller.getRawAxis(0),
-   * controller.getRawAxis(4), true); Not Being Used }
-   */
-
-
-  //
-  /*protected void initDefaultCommand() {
-    // TODO Auto-generated method stub
-
-  }*/
-
-  /*public void autoAlign(int visionCenter) {
-    if (joystickRight.getRawButton(3)) {
-      if (visionCenter - targetPixel >= 10) {
-        while (visionCenter - targetPixel >= 10) {
-          rotate(0.25);
-        }
-      }
-      if (visionCenter - targetPixel <= -10) {
-        while (visionCenter - targetPixel <= -10) {
-          rotate(-0.25);
-        }
-      }
-
-      if(Math.abs(visionCenter - targetPixel) <= 10){
-        rotate(0);
-      }
-
-    }
-  }*/
 }

@@ -74,14 +74,17 @@ public class Robot extends TimedRobot {
     private UsbCamera piCamera2;
     private VideoSink server;
     SequentialCommandGroup gridAuto;
-
+    private double [] yaw;
     /**
      * This function is run when the robot is first started up and should be used
      * for any initialization code.
      */
     @Override
     public void robotInit() {
+        HoloTable.getGyro().setYaw(0.0);
+        yaw=new double[3];
         
+
         gamepad1 = new XboxController(2);
         netInst = NetworkTableInstance.getDefault();
         table = netInst.getTable("datatable");
@@ -89,6 +92,9 @@ public class Robot extends TimedRobot {
         m_chooser.addOption("Auto Shoot", "Shoot");
         m_chooser.setDefaultOption("Auto Nav 1", "Run Auto Nav 1");
         m_chooser.addOption("Lidar Auto", "Lidar");
+        m_chooser.addOption("Auto Nav 2", "Auto Nav 2");
+        m_chooser.addOption("Auto Nav 3", "Auto Nav 3");
+
 
         lidarTable = netInst.getTable("lidar");
         lidarX = lidarTable.getEntry("x");
@@ -172,6 +178,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Feed Forward", kFF);
         SmartDashboard.putNumber("Max Output", kMaxOutput);
         SmartDashboard.putNumber("Min Output", kMinOutput);
+        
         driveTrain = new DriveTrain();
         CameraServer.getInstance().addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
         // CameraServer.getInstance().startAutomaticCapture(); // UNCOMMENT IF REVERTING
@@ -199,6 +206,10 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Lidar Y", ((double)lidarY.getNumber(-1) -initY));
         SmartDashboard.putNumber("Lidar T", ((double)lidarT.getNumber(-1) - initT));
         //SmartDashboard.putNumber("Lidar absolute", (double) lidarAbsolute.getNumber(-1.0));
+        
+        HoloTable.getGyro().getYawPitchRoll(yaw);
+        SmartDashboard.putNumber("gyro ******************", yaw[0]);
+     
     }
 
     /**
@@ -217,6 +228,10 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         Scheduler.getInstance().removeAll();
        // new GridAuto(driveTrain);
+
+        HoloTable.getGyro().setYaw(0.0);
+        yaw=new double[3];
+
         initX = ((double)lidarX.getNumber(-1));
         initY = ((double)lidarY.getNumber(-1));
         initT = ((double)lidarT.getNumber(-1));
@@ -232,7 +247,13 @@ public class Robot extends TimedRobot {
                 break;
             //case "Lidar" :
                 //CommandScheduler.getInstance().cancelAll();
-                //gridAuto.schedule();         
+                //gridAuto.schedule();    
+            case "Auto Nav 2":
+                autonomousCommand =new AutoNav2();
+                break;
+            case "Auto Nav 3":
+                autonomousCommand =new AutoNav3();
+                break;
             case "Run Auto Nav 1":
             default:
                 autonomousCommand =new AutoPath();
@@ -254,6 +275,8 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Lidar X", ((double)lidarX.getNumber(-1) - initX));
         SmartDashboard.putNumber("Lidar Y", ((double)lidarY.getNumber(-1) -initY));
         SmartDashboard.putNumber("Lidar T", ((double)lidarT.getNumber(-1) - initT));
+        HoloTable.getGyro().getYawPitchRoll(yaw);
+        SmartDashboard.putNumber("gyro ******************", yaw[0]);
                 }
     
 

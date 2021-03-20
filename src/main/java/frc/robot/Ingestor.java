@@ -16,13 +16,14 @@ public class Ingestor {
     boolean intakeDown = false;
 
     public void runIngestor() {
-        if (controller.getTriggerAxis(Hand.kLeft) == 180) {
+        /*if (controller.getTriggerAxis(Hand.kLeft) == 1) {
             intake.set(0.9);
-        } else if (controller.getTriggerAxis(Hand.kRight) == 180) {
+        } else if (controller.getTriggerAxis(Hand.kRight) == 1) {
             intake.set(-0.9);
         } else {
             intake.set(0.0);
-        }
+        }*/
+        intake.set((controller.getTriggerAxis(Hand.kLeft) -controller.getTriggerAxis(Hand.kRight))/1.0 * 0.9) ;
 
         if (gamepad1.getYButtonPressed()) {
             dropIntake.set(Value.kForward);

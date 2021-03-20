@@ -53,7 +53,30 @@ public class DriveTrain extends SubsystemBase {
   public void driveTank() {
     differentialDrive.tankDrive(controller.getY(Hand.kLeft)*0.5, controller.getY(Hand.kRight)*0.5, false);
   }
+
+  public void driveTankcbrt() {
+    differentialDrive.tankDrive(Math.cbrt(controller.getY(Hand.kLeft)), Math.cbrt(controller.getY(Hand.kRight)), false);
+  }
+
+  public void driveTankcube() {
+    differentialDrive.tankDrive(Math.pow(controller.getY(Hand.kLeft),3), Math.pow(controller.getY(Hand.kRight),3), false);
+  }
   public void driveSpeed(double speed , double rotation){
     differentialDrive.arcadeDrive(speed, rotation);
+  }
+  public void driveArcade(){
+    double xSpeed = 0.5*controller.getY(Hand.kLeft);
+    //xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
+    double zRotation = -0.25*controller.getX(Hand.kRight);
+    //zRotation = Math.copySign(zRotation * zRotation, zRotation);
+    differentialDrive.arcadeDrive(xSpeed,zRotation, false );
+  }
+
+  public void driveArcadecbrt(){
+    differentialDrive.arcadeDrive(Math.cbrt(controller.getY(Hand.kLeft)),Math.cbrt(controller.getX(Hand.kRight)) );
+  }
+
+  public void driveArcadecube(){
+    differentialDrive.arcadeDrive(Math.pow(controller.getY(Hand.kLeft),3),Math.pow(controller.getX(Hand.kRight),3) );
   }
 }

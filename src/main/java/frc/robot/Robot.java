@@ -87,6 +87,7 @@ public class Robot extends TimedRobot {
         table = netInst.getTable("datatable");
         lidarDist = table.getEntry("distance");
         m_chooser.addOption("Auto Shoot", "Shoot");
+        m_chooser.addOption("Camera Guided Shooting", "Camera Guided Shooting");
         m_chooser.setDefaultOption("Auto Nav 1", "Run Auto Nav 1");
         SmartDashboard.putData("Auto choices", m_chooser);
 
@@ -204,7 +205,7 @@ public class Robot extends TimedRobot {
                 autonomousCommand =new AutoRunAndShoot();
                 break;
             case "Camera Guided Shooting":
-                autonomousCommand = new CameraGuidedShooting();
+                autonomousCommand = new CameraGuidedShooting(driveTrain);
                 break;
             case "Run Auto Nav 1":
             default:

@@ -26,6 +26,7 @@ public class Pi{
     private NetworkTableEntry targetEntry;
     private static boolean turnLeft;
     private static boolean turnRight;
+    private static boolean hasTarget;
 
     private static final double X_RESOLUTION = 1280.0;
     Pi(){
@@ -40,9 +41,10 @@ public class Pi{
     public void processTargets() {
         Number[] targetListAsNumbers = targetEntry.getNumberArray(new Number[0]);
         if(targetListAsNumbers.length == 0) {
+            hasTarget = false;
             return;
         }
-
+        hasTarget =true;
         double xVal = (double) targetListAsNumbers[0]; // get first targert in list
         if(xVal <(0.5 * X_RESOLUTION) - 0.05 * X_RESOLUTION) {
             turnLeft =true;
@@ -57,6 +59,10 @@ public class Pi{
     }
     public static boolean getTurnLeft() {
         return turnLeft;
+    }
+
+    public static boolean getHasTarget(){
+        return hasTarget;
     }
 
     public static boolean getTurnRight(){

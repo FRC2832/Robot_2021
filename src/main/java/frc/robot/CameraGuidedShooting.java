@@ -53,7 +53,7 @@ public class CameraGuidedShooting extends Command {
     protected void execute() {
         // TODO Auto-generated method stub
         while (RobotState.isAutonomous()) {
-            if (isMoving = true) {
+            if (isMoving) {
 
                 Double timerVal = timer.get();
                 System.out.println(timerVal);

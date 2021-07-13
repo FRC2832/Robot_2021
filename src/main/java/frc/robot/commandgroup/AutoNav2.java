@@ -1,5 +1,6 @@
-package frc.robot;
+package frc.robot.commandgroup;
 
+import frc.robot.command.*;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 public class AutoNav2 extends CommandGroup{

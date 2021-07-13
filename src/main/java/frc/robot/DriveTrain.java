@@ -25,8 +25,6 @@ public class DriveTrain extends SubsystemBase {
   private XboxController controller;
   private SpeedControllerGroup leftMotors;
   private SpeedControllerGroup rightMotors;
-  private double driveCoeff;
-  
 
   /**
    * Creates a new DriveTrain.

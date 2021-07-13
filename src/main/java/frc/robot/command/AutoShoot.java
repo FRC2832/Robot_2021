@@ -1,9 +1,8 @@
-package frc.robot;
+package frc.robot.command;
 
+import frc.robot.*;
 import com.revrobotics.ControlType;
-
 import edu.wpi.first.wpilibj.command.Command;
-
 
 public class AutoShoot extends Command {
     

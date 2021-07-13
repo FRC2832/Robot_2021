@@ -6,20 +6,18 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.cscore.VideoSink;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commandgroup.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -37,44 +35,19 @@ public class Robot extends TimedRobot {
     private Hopper hopper = new Hopper();
     private Climber climber = new Climber();
 
-      private final Pi pi = new Pi();
+    private final Pi pi = new Pi();
     private String m_autoSelected;
     private final SendableChooser<String> m_chooser = new SendableChooser<>();
     public static double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, fastTopRPM, fastBottomRPM, emptyTopRPM,
             emptyBottomRPM, setTop, setBottom;
     public static DriveTrain driveTrain;
-    private static int visionCenterX = 640;
     private NetworkTableInstance netInst;
-    private NetworkTable table;
     private NetworkTable lidarTable;
-    private final double[] defaultValue = { -1.0 };
-    private boolean isCamValueUpdated;
-    private XboxController gamepad1;
-    private NetworkTableEntry cameraSelect, centerXEntry, lidarX, lidarY, lidarT, lidarAbsolute;
+    private NetworkTableEntry lidarX, lidarY, lidarT;
     private static double initX,initY,initT;
-    private double currentX, currentY, currentT, c12x, c12y, c34x, c34y;
-    // NetworkTableEntry cameraSelect =
-    // NetworkTableInstance.getDefault().getEntry("/camselect");
-
-    /*
-     * UsbCamera piCamera1; UsbCamera piCamera2; VideoSink server;
-     */
-    private JoystickButton buttonA, buttonB, buttonX;
-
-    // NetworkTableEntry cameraSelect =
-    // NetworkTableInstance.getDefault().getEntry("/camselect");
-
-    private NetworkTableEntry lidarDist;
-
-    /*
-     * UsbCamera camera1; UsbCamera camera2; NetworkTableEntry cameraSelection;
-     */
-
-    private UsbCamera piCamera1;
-    private UsbCamera piCamera2;
-    private VideoSink server;
     SequentialCommandGroup gridAuto;
-    private double [] yaw;
+    private double[] yaw;
+
     /**
      * This function is run when the robot is first started up and should be used
      * for any initialization code.
@@ -82,39 +55,27 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         HoloTable.getGyro().setYaw(0.0);
-        yaw=new double[3];
-        
+        yaw = new double[3];
 
-        gamepad1 = new XboxController(2);
         netInst = NetworkTableInstance.getDefault();
-        table = netInst.getTable("datatable");
-        lidarDist = table.getEntry("distance");
         m_chooser.addOption("Auto Shoot", "Shoot");
         m_chooser.setDefaultOption("Auto Nav 1", "Run Auto Nav 1");
         m_chooser.addOption("Lidar Auto", "Lidar");
         m_chooser.addOption("Auto Nav 2", "Auto Nav 2");
         m_chooser.addOption("Auto Nav 3", "Auto Nav 3");
 
-
         lidarTable = netInst.getTable("lidar");
         lidarX = lidarTable.getEntry("x");
         lidarY = lidarTable.getEntry("y");
         lidarT = lidarTable.getEntry("t");
-        lidarAbsolute = lidarTable.getEntry("absolute");
 
         SmartDashboard.putData("Auto choices", m_chooser);
-        
-        
-        c12x = 2000;
-        c12y = 2000;
 
-        c34x = 4000;
-        c34y = 0;
         initX = 0;
         initY = 0;
         initT = 0;
         kP = 0;
-       // kP = 6e-5;
+        // kP = 6e-5;
         kI = 0;
         kD = 0;
         kIz = 0;
@@ -126,39 +87,35 @@ public class Robot extends TimedRobot {
         emptyTopRPM = -3000.0;
         emptyBottomRPM = 3000.0;
 
-        buttonA = new JoystickButton(gamepad1, 1);
-        buttonB = new JoystickButton(gamepad1, 2);
-        buttonX = new JoystickButton(gamepad1, 3);
-
         // set PID coefficients
 
-        //Autonomous variables
+        // Autonomous variables
 
         holo.frontLeftPID.setP(Robot.kP);
         holo.rearLeftPID.setP(Robot.kP);
         holo.frontRightPID.setP(Robot.kP);
         holo.rearRightPID.setP(Robot.kP);
-  
+
         holo.frontLeftPID.setI(Robot.kI);
         holo.rearLeftPID.setI(Robot.kI);
         holo.frontRightPID.setI(Robot.kI);
         holo.rearRightPID.setI(Robot.kI);
-  
+
         holo.frontLeftPID.setD(Robot.kD);
         holo.rearLeftPID.setD(Robot.kD);
         holo.frontRightPID.setD(Robot.kD);
         holo.rearRightPID.setD(Robot.kD);
-  
+
         holo.frontLeftPID.setIZone(Robot.kIz);
         holo.rearLeftPID.setIZone(Robot.kIz);
         holo.frontRightPID.setIZone(Robot.kIz);
         holo.rearRightPID.setIZone(Robot.kIz);
-  
+
         holo.frontLeftPID.setFF(Robot.kFF);
         holo.rearLeftPID.setFF(Robot.kFF);
         holo.frontRightPID.setFF(Robot.kFF);
         holo.rearRightPID.setFF(Robot.kFF);
-          
+
         holo.frontLeftPID.setOutputRange(Robot.kMinOutput, Robot.kMaxOutput);
         holo.rearLeftPID.setOutputRange(Robot.kMinOutput, Robot.kMaxOutput);
         holo.frontRightPID.setOutputRange(Robot.kMinOutput, Robot.kMaxOutput);
@@ -178,15 +135,12 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Feed Forward", kFF);
         SmartDashboard.putNumber("Max Output", kMaxOutput);
         SmartDashboard.putNumber("Min Output", kMinOutput);
-        
+
         driveTrain = new DriveTrain();
         CameraServer.getInstance().addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
-        // CameraServer.getInstance().startAutomaticCapture(); // UNCOMMENT IF REVERTING
-        // camera1 = CameraServer.getInstance().startAutomaticCapture(0);
-        piCamera1 = CameraServer.getInstance().startAutomaticCapture(0);
-        piCamera2 = CameraServer.getInstance().startAutomaticCapture(1);
-        server = CameraServer.getInstance().getServer();
-        //gridAuto = new GridAuto(driveTrain);
+        CameraServer.getInstance().startAutomaticCapture(0);
+        CameraServer.getInstance().startAutomaticCapture(1);
+        CameraServer.getInstance().getServer();
     }
 
     /**
@@ -281,7 +235,6 @@ public class Robot extends TimedRobot {
     
 
     public void teleopInit() {
-        // TODO Auto-generated method stub
         Scheduler.getInstance().removeAll();
         initX = ((double)lidarX.getNumber(-1));
         initY = ((double)lidarY.getNumber(-1));

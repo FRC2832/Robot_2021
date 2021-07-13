@@ -1,5 +1,6 @@
-package frc.robot;
+package frc.robot.command;
 
+import frc.robot.*;
 import edu.wpi.first.wpilibj.command.Command;
 import com.revrobotics.ControlType;
 

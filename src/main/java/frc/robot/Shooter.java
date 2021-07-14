@@ -59,9 +59,6 @@ public class Shooter {
             Robot.kMaxOutput = max;
         }
        
-        if (HoloTable.getInstance().getController().getBumper(Hand.kLeft)) {
-            hopper.set(-0.5);
-        }
         if (HoloTable.getInstance().getController().getBumperPressed(Hand.kLeft)) {
             mult = shTable.getMultiplier(holo.getDistance0());
             shootSpeed = 255.0 * mult;

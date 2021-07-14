@@ -33,28 +33,34 @@ public final class Hopper {
     }
 
     public void runMotors() {    
-        if (!infraredIntake.get()){
-            if (!infraredHopper1.get()){
-                if (!infraredHopper2.get()){
-                    hopper.set(0);
+ 
+        if (gamepad1.getAButton()) {
+            //if a is pressed, this is shoot mode, so run the hopper
+            hopper.set(-.5);           
+        }
+        else if (gamepad1.getBButton()) {
+            //if b is pressed, run the hopper backwards to stop jams
+            hopper.set(0.4);           
+        }
+        else if (gamepad1.getBumper(Hand.kRight)) {
+            //if right bumper pressed, intake unless hopper sensor think full
+            if (!infraredIntake.get()){
+                if (!infraredHopper1.get()){
+                    if (!infraredHopper2.get()){
+                        hopper.set(0);
+                    }else {
+                        hopper.set(-.5);
+                    }
                 }else {
                     hopper.set(-.5);
                 }
             }else {
-                hopper.set(-.5);
+                hopper.set(0);
             }
-        }else {
+        } else{
+            //no controller pressed, do nothing
             hopper.set(0);
         }
-        if (gamepad1.getBumper(Hand.kLeft)) {
-            hopper.set(.5);
-            logger.warning("Backwards");
-            
-        }
-        else if (gamepad1.getBumper(Hand.kRight)) {
-            hopper.set(-.5);
-            logger.warning("Fowards");
-        } 
        
     }
 

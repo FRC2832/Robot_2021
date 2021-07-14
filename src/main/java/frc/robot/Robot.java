@@ -163,7 +163,9 @@ public class Robot extends TimedRobot {
         
         HoloTable.getGyro().getYawPitchRoll(yaw);
         SmartDashboard.putNumber("gyro ******************", yaw[0]);
-     
+        SmartDashboard.putBoolean("Hopper Infrared1", holo.getInfraredHopper1().get());
+        SmartDashboard.putBoolean("Hopper Infrared2", holo.getInfraredHopper2().get());
+        SmartDashboard.putBoolean("Hopper Intake", holo.getInfraredIntake().get());
     }
 
     /**
@@ -234,6 +236,7 @@ public class Robot extends TimedRobot {
                 }
     
 
+    @Override
     public void teleopInit() {
         Scheduler.getInstance().removeAll();
         initX = ((double)lidarX.getNumber(-1));

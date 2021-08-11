@@ -12,56 +12,56 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TurnToCoordsLeft extends CommandBase {
-  double targetX, targetY;
-  NetworkTable lidarTable;
-  NetworkTableEntry lidarX, lidarY, lidarT;
-  NetworkTableInstance netInst;
-  DriveTrain m_driveTrain;
-  boolean finished = false;
-  double targetAngle;
+    private double targetX, targetY;
+    private NetworkTable lidarTable;
+    private NetworkTableEntry lidarX, lidarY, lidarT;
+    private NetworkTableInstance netInst;
+    private DriveTrain driveTrain;
+    private boolean isFinished = false;
+    private double targetAngle;
 
-  /** Creates a new DriveToCoords. */
-  public TurnToCoordsLeft(DriveTrain driveTrain, double targetX, double targetY) {
-    this.targetX = targetX;
-    this.targetY = targetY;
-    m_driveTrain = driveTrain;
-    addRequirements(m_driveTrain);
-  }
+    /** Creates a new DriveToCoords. */
+    public TurnToCoordsLeft(DriveTrain driveTrain, double targetX, double targetY) {
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.driveTrain = driveTrain;
+        addRequirements(driveTrain);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    
-    m_driveTrain.driveSpeed(0,0);
-    System.out.println("TURNING TO: " + targetX + ", " + targetY);
-    netInst = NetworkTableInstance.getDefault();
-    lidarTable = netInst.getTable("lidar");
-    lidarX = lidarTable.getEntry("x");
-    lidarY = lidarTable.getEntry("y");
-    lidarT = lidarTable.getEntry("t");
-    targetAngle = Math.toDegrees(Math.atan( (targetY - (double)lidarY.getNumber(-1))/(targetX - (double)lidarX.getNumber(-1))));
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        driveTrain.driveSpeed(0.0, 0.0);
+        System.out.println("TURNING TO: " + targetX + ", " + targetY);
+        netInst = NetworkTableInstance.getDefault();
+        lidarTable = netInst.getTable("lidar");
+        lidarX = lidarTable.getEntry("x");
+        lidarY = lidarTable.getEntry("y");
+        lidarT = lidarTable.getEntry("t");
+        targetAngle = Math.toDegrees(
+                Math.atan((targetY - (double) lidarY.getNumber(-1)) / (targetX - (double) lidarX.getNumber(-1))));
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    System.out.println("TURNING TO: " + targetX + ", " + targetY);
-    System.out.println("TARGET ANGLE: " + targetAngle);
-    m_driveTrain.driveSpeed(0,0.35);
-      if((((double)lidarT.getNumber(-1)) - Robot.getInitT()) <= (targetAngle)){ //Math.toDegrees(Math.atan(c1y/c1x)))
-        m_driveTrain.driveSpeed(0,0);
-        finished = true;
-      }
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        System.out.println("TURNING TO: " + targetX + ", " + targetY);
+        System.out.println("TARGET ANGLE: " + targetAngle);
+        driveTrain.driveSpeed(0.0, 0.35);
+        if ((((double) lidarT.getNumber(-1)) - Robot.getInitT()) <= (targetAngle)) { // Math.toDegrees(Math.atan(c1y/c1x)))
+            driveTrain.driveSpeed(0.0, 0.0);
+            isFinished = true;
+        }
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return finished;
-  }
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return isFinished;
+    }
 }

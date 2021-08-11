@@ -15,19 +15,18 @@ import java.util.Map;
  */
 public class ShootingTable {
     private static ShootingTable instance = null;
-    private static Map<Integer, Double> shootingTable = new HashMap<>(); //The integer is the distance in inches, the double is the multiplier
+    private static Map<Integer, Double> shootingTable = new HashMap<>(); // The integer is the distance in inches, the
+                                                                         // double is the multiplier
     private int distanceSh = 0;
 
-    
-
-    public ShootingTable(){
-        shootingTable.put(0 , 1.0);
-        shootingTable.put(24 , 1.0);
+    public ShootingTable() {
+        shootingTable.put(0, 1.0);
+        shootingTable.put(24, 1.0);
         shootingTable.put(48, 1.0);
-        shootingTable.put(72 , 1.0);
-        shootingTable.put(96 , 1.0);
-        
-        //shootingTable.put(114, 0.5);
+        shootingTable.put(72, 1.0);
+        shootingTable.put(96, 1.0);
+
+        // shootingTable.put(114, 0.5);
 
         shootingTable.put(120, 1.0);
         shootingTable.put(144, 0.75);
@@ -43,24 +42,21 @@ public class ShootingTable {
     }
 
     public static ShootingTable getInstance() {
-
         if (instance == null) {
             instance = new ShootingTable();
         }
-
         return instance;
-
     }
 
-    public double getMultiplier(double distance){
+    public double getMultiplier(double distance) {
         System.out.println("Distance " + distance);
-        System.out.println("CURRENT TABLE INDEX: " + (int)(((int) distance) - ( ((int)distance) % 24)));
-        distanceSh = (int)(((int) distance) - ( ((int)distance) % 24));
-        double multiplier=0.85d;
+        System.out.println("CURRENT TABLE INDEX: " + (int) (((int) distance) - (((int) distance) % 24)));
+        distanceSh = (int) (((int) distance) - (((int) distance) % 24));
+        double multiplier = 0.85d;
         try {
-            multiplier =shootingTable.get(distanceSh);
-        }catch (RuntimeException e){
-            //multiplier=0.9;
+            multiplier = shootingTable.get(distanceSh);
+        } catch (RuntimeException e) {
+            // multiplier=0.9;
         }
 
         return multiplier;

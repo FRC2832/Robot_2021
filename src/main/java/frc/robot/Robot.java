@@ -151,7 +151,7 @@ public class Robot extends TimedRobot {
         camServer = CameraServer.getInstance();
         camServer.addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
         camServer.startAutomaticCapture(0);
-        camServer.startAutomaticCapture(1);
+        //camServer.startAutomaticCapture(1);
         camServer.getServer();
     }
 

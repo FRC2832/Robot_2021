@@ -21,7 +21,10 @@ public final class Climber {
     public void runClimb() {
         double leftSpeed;
         double rightSpeed;
-        if (operatorGamepad.getBackButton()) { // Retract left arm.
+        if (table.getIsDriveTrainAutonomous()) {
+            leftSpeed = 0.0;
+            rightSpeed = 0.0;
+        } else if (operatorGamepad.getBackButton()) { // Retract left arm.
             leftSpeed = 0.5;
             rightSpeed = 0.0;
         } else if (operatorGamepad.getStartButton()) { // Retract right arm.

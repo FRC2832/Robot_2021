@@ -28,11 +28,16 @@ public class Ingestor {
          * (controller.getTriggerAxis(Hand.kRight) == 1) { intake.set(-0.9); } else {
          * intake.set(0.0); }
          */
-        intake.set((operatorGamepad.getTriggerAxis(Hand.kLeft) - operatorGamepad.getTriggerAxis(Hand.kRight)) / 1.0 * 0.9);
-        if (operatorGamepad.getYButtonPressed()) {
-            dropIntake.set(Value.kForward);
-        } else if (operatorGamepad.getXButtonPressed()) {
-            dropIntake.set(Value.kReverse);
+
+        if (holoTable.getIsDriveTrainAutonomous()) {
+
+        } else {
+            intake.set((operatorGamepad.getTriggerAxis(Hand.kLeft) - operatorGamepad.getTriggerAxis(Hand.kRight)) / 1.0 * 0.9);
+            if (operatorGamepad.getYButtonPressed()) {
+                dropIntake.set(Value.kForward);
+            } else if (operatorGamepad.getXButtonPressed()) {
+                dropIntake.set(Value.kReverse);
+            }
         }
     }
 }

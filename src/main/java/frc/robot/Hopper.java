@@ -31,7 +31,9 @@ public final class Hopper {
 
     public void runMotors() {
         double hopperSpeed;
-        if (operatorGamepad.getAButton()) {
+        if (table.getIsDriveTrainAutonomous()) {
+            hopperSpeed = 0.0; // TODO: This is just a placeholder.
+        } else if (operatorGamepad.getAButton()) {
             // if a is pressed, this is shoot mode, so run the hopper
             hopperSpeed = -0.5;
         } else if (operatorGamepad.getBButton()) {

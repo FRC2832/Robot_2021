@@ -83,4 +83,17 @@ public class DriveTrain extends SubsystemBase {
         differentialDrive.arcadeDrive(Math.pow(driverController.getY(Hand.kLeft), 3.0),
                 Math.pow(driverController.getX(Hand.kRight), 3.0));
     }
+
+    public void runDriveTrain() {
+        if (driverController.getStartButton()) {
+            // Do auto stuff
+            // Tell other subsystems we're doing auto stuff.
+            holo.setIsDriveTrainAutonomous(true);
+            
+            
+        } else {
+            holo.setIsDriveTrainAutonomous(false);
+            driveTank();
+        }
+    }
 }

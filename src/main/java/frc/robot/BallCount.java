@@ -37,7 +37,7 @@ public final class BallCount {
 
     }
 
-    public void saftyCheck() {
+    public void safetyCheck() {
         if (!infraredHopper1.get() && !infraredHopper2.get()) {
             intake.set(0);
         }

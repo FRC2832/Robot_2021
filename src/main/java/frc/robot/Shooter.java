@@ -3,6 +3,8 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.ControlType;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,6 +15,7 @@ public class Shooter {
     // private ShootingTable shTable;
     private XboxController operatorGamepad;
     private WPI_TalonSRX ejector;
+    private NetworkTable table;
     // private CANSparkMax rightRear;
     // private CANSparkMax rightFront;
     // private WPI_TalonSRX hopper = holo.getHopper();
@@ -27,6 +30,9 @@ public class Shooter {
         ejector = holo.getEjector();
         // rightRear = holo.getDriveRightRear();
         // rightFront = holo.getDriveRightFront();
+        table = NetworkTableInstance.getDefault().getTable("Shooter");
+        table.getEntry("Top Target").setDouble(215);
+        table.getEntry("Bottom Target").setDouble(180);
     }
 
     public void runShooter() throws InterruptedException {
@@ -73,9 +79,11 @@ public class Shooter {
             if (operatorGamepad.getBumperPressed(Hand.kLeft)) {
                 // mult = shTable.getMultiplier(holo.getDistance0());
                 // shootSpeed = 255.0 * mult;
-
-                holo.topPID.setReference(-215.0, ControlType.kVelocity);
-                holo.bottomPID.setReference(180.0, ControlType.kVelocity);
+                
+                var tSpeed = table.getEntry("Top Target").getDouble(215);
+                var bSpeed = table.getEntry("Bottom Target").getDouble(180);
+                holo.topPID.setReference(-tSpeed, ControlType.kVelocity);
+                holo.bottomPID.setReference(bSpeed, ControlType.kVelocity);
 
                 // isShooterOff = false;
                 // ejector.set(0.25);
@@ -102,5 +110,14 @@ public class Shooter {
                 ejector.set(0.0);
             }
         }
+
+        var mTop = holo.getTopShooter();
+        var mBot = holo.getBottomShooter();
+        table.getEntry("Top Velocity").setDouble(mTop.getEncoder().getVelocity());
+        table.getEntry("Top Output%").setDouble(mTop.getAppliedOutput());
+        table.getEntry("Top Current").setDouble(mTop.getOutputCurrent());
+        table.getEntry("Bottom Velocity").setDouble(mBot.getEncoder().getVelocity());
+        table.getEntry("Bottom Output%").setDouble(mBot.getAppliedOutput());
+        table.getEntry("Bottom Current").setDouble(mBot.getOutputCurrent());
     }
 }

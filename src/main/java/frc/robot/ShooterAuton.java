@@ -23,6 +23,15 @@ public class ShooterAuton {
                 msg = "aiming";
                 centerRobot();
             }
+            /*
+            for shooting: 
+            if (motor speed is not at target shooting speed) {
+                pull code from pressing left bumper in Shooter.java
+            } else {
+                pull code from pressing A button in Shooter.java
+                may have to "press RB" to get next ball in position in shooter - find where RB on the operator gamepad is pressed
+            }
+            */
 
             //TODO: add setting speed to 0 at the end of this if statement?
         } else { // shooter not running

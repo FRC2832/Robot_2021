@@ -10,14 +10,14 @@ public class Ingestor {
 
     private HoloTable holoTable;
     private WPI_TalonSRX intake;
-    private XboxController operatorGamepad;
+    private XboxController driverGamepad;
     private DoubleSolenoid dropIntake;
     //private boolean isIntakeDown;
 
     public Ingestor() {
         holoTable = HoloTable.getInstance();
         intake = holoTable.getIntake();
-        operatorGamepad = holoTable.getOperatorController();
+        driverGamepad = holoTable.getDriverController();
         dropIntake = holoTable.getDropIntake();
         //isIntakeDown = false;
     }
@@ -32,10 +32,10 @@ public class Ingestor {
         if (holoTable.getIsDriveTrainAutonomous()) {
 
         } else {
-            intake.set((operatorGamepad.getTriggerAxis(Hand.kLeft) - operatorGamepad.getTriggerAxis(Hand.kRight)) / 1.0 * 0.9);
-            if (operatorGamepad.getYButtonPressed()) {
+            intake.set((driverGamepad.getTriggerAxis(Hand.kLeft) - driverGamepad.getTriggerAxis(Hand.kRight)) / 1.0 * 0.9);
+            if (driverGamepad.getYButtonPressed()) {
                 dropIntake.set(Value.kForward);
-            } else if (operatorGamepad.getXButtonPressed()) {
+            } else if (driverGamepad.getXButtonPressed()) {
                 dropIntake.set(Value.kReverse);
             }
         }

@@ -74,7 +74,8 @@ public class Shooter {
         }
 
         if (holo.getIsDriveTrainAutonomous()) {
-            // TODO: Operate shooter autonomously
+            // since we're in auton mode, no commands happen
+            // code for shooting is in ShooterAuton
         } else {
             if (operatorGamepad.getBumperPressed(Hand.kLeft)) {
                 // mult = shTable.getMultiplier(holo.getDistance0());

@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
     private Climber climber;
     private CameraServer camServer;
     private PigeonIMU gyro;
+    private ShooterAuton shooterAuton;
 
     private Pi pi;
     private String m_autoSelected;
@@ -67,6 +68,7 @@ public class Robot extends TimedRobot {
         gyro = holo.getGyro();
         gyro.setYaw(0.0);
         yaw = new double[3];
+        shooterAuton = new ShooterAuton();
 
         netInst = NetworkTableInstance.getDefault();
         m_chooser.addOption("Auto Shoot", "Shoot");
@@ -152,7 +154,7 @@ public class Robot extends TimedRobot {
         camServer.addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
         //camServer.startAutomaticCapture(0);
         //camServer.startAutomaticCapture(1);
-        camServer.getServer();
+        //camServer.getServer();
     }
 
     /**
@@ -277,6 +279,8 @@ public class Robot extends TimedRobot {
         // driveTrain.driveArcadecbrt();
         // driveTrain.driveArcadecube();
         pi.switchCameras();
+
+        shooterAuton.runShooterAuton();
 
         /*
          * if (gamepad1.getXButtonPressed()) { cameraSelect.setDouble(2); }

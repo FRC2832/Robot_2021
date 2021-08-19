@@ -141,6 +141,9 @@ public class Robot extends TimedRobot {
         CameraServer.getInstance().startAutomaticCapture(0);
         CameraServer.getInstance().startAutomaticCapture(1);
         CameraServer.getInstance().getServer();
+
+        GitVersion vers = GitVersion.loadVersion();
+        vers.printVersions();
     }
 
     /**

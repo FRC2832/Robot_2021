@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -29,13 +31,15 @@ import frc.robot.commandgroup.*;
 public class Robot extends TimedRobot {
 
     private Command autonomousCommand;
-    private HoloTable holo = HoloTable.getInstance();
-    private Shooter shooter = new Shooter();
-    private Ingestor ingestor = new Ingestor();
-    private Hopper hopper = new Hopper();
-    private Climber climber = new Climber();
+    private HoloTable holo;
+    private Shooter shooter;
+    private Ingestor ingestor;
+    private Hopper hopper;
+    private Climber climber;
+    private CameraServer camServer;
+    private PigeonIMU gyro;
 
-    private final Pi pi = new Pi();
+    private Pi pi;
     private String m_autoSelected;
     private final SendableChooser<String> m_chooser = new SendableChooser<>();
     public static double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, fastTopRPM, fastBottomRPM, emptyTopRPM,
@@ -44,7 +48,7 @@ public class Robot extends TimedRobot {
     private NetworkTableInstance netInst;
     private NetworkTable lidarTable;
     private NetworkTableEntry lidarX, lidarY, lidarT;
-    private static double initX,initY,initT;
+    private static double initX, initY, initT;
     SequentialCommandGroup gridAuto;
     private double[] yaw;
 
@@ -54,7 +58,14 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotInit() {
-        HoloTable.getGyro().setYaw(0.0);
+        shooter = new Shooter();
+        ingestor = new Ingestor();
+        hopper = new Hopper();
+        climber = new Climber();
+        pi = new Pi();
+        holo = HoloTable.getInstance();
+        gyro = holo.getGyro();
+        gyro.setYaw(0.0);
         yaw = new double[3];
 
         netInst = NetworkTableInstance.getDefault();
@@ -71,14 +82,14 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putData("Auto choices", m_chooser);
 
-        initX = 0;
-        initY = 0;
-        initT = 0;
-        kP = 0;
+        initX = 0.0;
+        initY = 0.0;
+        initT = 0.0;
+        kP = 0.0;
         // kP = 6e-5;
-        kI = 0;
-        kD = 0;
-        kIz = 0;
+        kI = 0.0;
+        kD = 0.0;
+        kIz = 0.0;
         kFF = 0.0023;
         kMaxOutput = 1.0;
         kMinOutput = -1.0;
@@ -137,10 +148,11 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Min Output", kMinOutput);
 
         driveTrain = new DriveTrain();
-        CameraServer.getInstance().addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
-        CameraServer.getInstance().startAutomaticCapture(0);
-        CameraServer.getInstance().startAutomaticCapture(1);
-        CameraServer.getInstance().getServer();
+        camServer = CameraServer.getInstance();
+        camServer.addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
+        camServer.startAutomaticCapture(0);
+        //camServer.startAutomaticCapture(1);
+        camServer.getServer();
     }
 
     /**
@@ -154,14 +166,16 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        
-        //SmartDashboard.putNumber("Lidar Distance", (double) table.getEntry("distance0").getNumber(-1.0));
-        SmartDashboard.putNumber("Lidar X", ((double)lidarX.getNumber(-1) - initX));
-        SmartDashboard.putNumber("Lidar Y", ((double)lidarY.getNumber(-1) -initY));
-        SmartDashboard.putNumber("Lidar T", ((double)lidarT.getNumber(-1) - initT));
-        //SmartDashboard.putNumber("Lidar absolute", (double) lidarAbsolute.getNumber(-1.0));
-        
-        HoloTable.getGyro().getYawPitchRoll(yaw);
+
+        // SmartDashboard.putNumber("Lidar Distance", (double)
+        // table.getEntry("distance0").getNumber(-1.0));
+        SmartDashboard.putNumber("Lidar X", ((double) lidarX.getNumber(-1) - initX));
+        SmartDashboard.putNumber("Lidar Y", ((double) lidarY.getNumber(-1) - initY));
+        SmartDashboard.putNumber("Lidar T", ((double) lidarT.getNumber(-1) - initT));
+        // SmartDashboard.putNumber("Lidar absolute", (double)
+        // lidarAbsolute.getNumber(-1.0));
+
+        gyro.getYawPitchRoll(yaw);
         SmartDashboard.putNumber("gyro ******************", yaw[0]);
         SmartDashboard.putBoolean("Hopper Infrared1", holo.getInfraredHopper1().get());
         SmartDashboard.putBoolean("Hopper Infrared2", holo.getInfraredHopper2().get());
@@ -183,41 +197,38 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         Scheduler.getInstance().removeAll();
-       // new GridAuto(driveTrain);
-
-        HoloTable.getGyro().setYaw(0.0);
-        yaw=new double[3];
-
-        initX = ((double)lidarX.getNumber(-1));
-        initY = ((double)lidarY.getNumber(-1));
-        initT = ((double)lidarT.getNumber(-1));
-
+        // new GridAuto(driveTrain);
+        gyro.setYaw(0.0);
+        yaw = new double[3];
+        initX = ((double) lidarX.getNumber(-1));
+        initY = ((double) lidarY.getNumber(-1));
+        initT = ((double) lidarT.getNumber(-1));
         m_autoSelected = m_chooser.getSelected();
-
         m_autoSelected = SmartDashboard.getString("Auto Selector", m_autoSelected);
-        
+
         System.out.println("Auto selected: " + m_autoSelected);
         switch (m_autoSelected) {
             case "Shoot":
-                autonomousCommand =new AutoRunAndShoot();
+                autonomousCommand = new AutoRunAndShoot();
                 break;
-            //case "Lidar" :
-                //CommandScheduler.getInstance().cancelAll();
-                //gridAuto.schedule();    
+            // case "Lidar" :
+            // CommandScheduler.getInstance().cancelAll();
+            // gridAuto.schedule();
             case "Auto Nav 2":
-                autonomousCommand =new AutoNav2();
+                autonomousCommand = new AutoNav2();
                 break;
             case "Auto Nav 3":
-                autonomousCommand =new AutoNav3();
+                autonomousCommand = new AutoNav3();
                 break;
             case "Run Auto Nav 1":
             default:
-                autonomousCommand =new AutoNav1();
+                autonomousCommand = new AutoNav1();
                 break;
-            
+
         }
 
-        if (autonomousCommand != null) autonomousCommand.start();
+        if (autonomousCommand != null)
+            autonomousCommand.start();
     }
 
     /**
@@ -225,23 +236,22 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
-        
+
         Scheduler.getInstance().run();
 
-        SmartDashboard.putNumber("Lidar X", ((double)lidarX.getNumber(-1) - initX));
-        SmartDashboard.putNumber("Lidar Y", ((double)lidarY.getNumber(-1) -initY));
-        SmartDashboard.putNumber("Lidar T", ((double)lidarT.getNumber(-1) - initT));
-        HoloTable.getGyro().getYawPitchRoll(yaw);
+        SmartDashboard.putNumber("Lidar X", ((double) lidarX.getNumber(-1) - initX));
+        SmartDashboard.putNumber("Lidar Y", ((double) lidarY.getNumber(-1) - initY));
+        SmartDashboard.putNumber("Lidar T", ((double) lidarT.getNumber(-1) - initT));
+        gyro.getYawPitchRoll(yaw);
         SmartDashboard.putNumber("gyro ******************", yaw[0]);
-                }
-    
+    }
 
     @Override
     public void teleopInit() {
         Scheduler.getInstance().removeAll();
-        initX = ((double)lidarX.getNumber(-1));
-        initY = ((double)lidarY.getNumber(-1));
-        initT = ((double)lidarT.getNumber(-1));
+        initX = ((double) lidarX.getNumber(-1));
+        initY = ((double) lidarY.getNumber(-1));
+        initT = ((double) lidarT.getNumber(-1));
     }
 
     /**
@@ -252,24 +262,22 @@ public class Robot extends TimedRobot {
         Scheduler.getInstance().run();
         ingestor.runIngestor();
 
-            hopper.runMotors();
-            climber.runClimb();
+        hopper.runMotors();
+        climber.runClimb();
         try {
             shooter.runShooter();
         } catch (final InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        //driveTrain.driveTank();
-        //driveTrain.driveTankcbrt();
-        //driveTrain.driveTankcube();
-        driveTrain.driveArcade();
-        //driveTrain.driveArcadecbrt();
-        //driveTrain.driveArcadecube();
+        driveTrain.driveTank();
+        // driveTrain.driveTankcbrt();
+        // driveTrain.driveTankcube();
+        //driveTrain.driveArcade();
+        // driveTrain.driveArcadecbrt();
+        // driveTrain.driveArcadecube();
         pi.switchCameras();
 
-      
         /*
          * if (gamepad1.getXButtonPressed()) { cameraSelect.setDouble(2); }
          */
@@ -291,18 +299,16 @@ public class Robot extends TimedRobot {
 
     }
 
-    public static double getInitX(){
+    public static double getInitX() {
         return initX;
     }
 
-    public static double getInitY(){
+    public static double getInitY() {
         return initY;
     }
 
-    public static double getInitT(){
+    public static double getInitT() {
         return initT;
     }
 
-
-    
 }

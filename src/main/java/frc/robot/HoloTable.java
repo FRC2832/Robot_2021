@@ -37,17 +37,16 @@ public final class HoloTable {
     public CANPIDController topPID;
     public CANPIDController bottomPID;
 
-
     public CANPIDController frontLeftPID;
     public CANPIDController frontRightPID;
     public CANPIDController rearLeftPID;
     public CANPIDController rearRightPID;
-    
-    private static XboxController controller;
+
+    private static XboxController driverController;
+    private static XboxController operatorController;
 
     private static CANSparkMax climberLeft;
     private static CANSparkMax climberRight;
-   
 
     // private static Insert Camera Here;
     // private static Insert Color Sensor Here;
@@ -56,11 +55,9 @@ public final class HoloTable {
     private static CANSparkMax shooterBottom;
     private static WPI_TalonSRX ejector;
 
-
     private NetworkTable table;
 
- 
-    HoloTable() {
+    public HoloTable() {
         // driveTurn = new WPI_TalonSRX(0);
         gyro = new PigeonIMU(new WPI_TalonSRX(11));
         // dropIntake = new DoubleSolenoid(0, 1);
@@ -74,7 +71,7 @@ public final class HoloTable {
         infraredHopper2 = new DigitalInput(2);
         infraredIntake = new DigitalInput(1);
 
-        //shooter side is "front", left is CAN2, right is CAN3
+        // shooter side is "front", left is CAN2, right is CAN3
         climberLeft = new CANSparkMax(2, MotorType.kBrushless);
         climberRight = new CANSparkMax(3, MotorType.kBrushless);
         climberLeft.setInverted(false);
@@ -85,7 +82,6 @@ public final class HoloTable {
         topPID = shooterTop.getPIDController();
         bottomPID = shooterBottom.getPIDController();
 
-        
         topPID = shooterTop.getPIDController();
         bottomPID = shooterBottom.getPIDController();
         dropIntake = new DoubleSolenoid(0, 1);
@@ -98,10 +94,11 @@ public final class HoloTable {
         frontLeftPID = driveLeftFront.getPIDController();
         frontRightPID = driveRightFront.getPIDController();
         rearLeftPID = driveLeftRear.getPIDController();
-        rearRightPID= driveRightRear.getPIDController();
+        rearRightPID = driveRightRear.getPIDController();
 
-        controller = new XboxController(2);
-      
+        driverController = new XboxController(2);
+        operatorController = new XboxController(3);
+
         table = NetworkTableInstance.getDefault().getTable("datatable");
     }
 
@@ -132,7 +129,7 @@ public final class HoloTable {
         return driveLeftRear;
     }
 
-    public static PigeonIMU getGyro() {
+    public PigeonIMU getGyro() {
         return gyro;
     }
 
@@ -140,11 +137,15 @@ public final class HoloTable {
         return dropIntake;
     }
 
-    public XboxController getController() {
-        return controller;
+    public XboxController getDriverController() {
+        return driverController;
     }
 
-      public WPI_TalonSRX getIntake() {
+    public XboxController getOperatorController() {
+        return operatorController;
+    }
+
+    public WPI_TalonSRX getIntake() {
         return intake;
     }
 
@@ -191,17 +192,17 @@ public final class HoloTable {
     public WPI_TalonSRX getColor() {
         return color;
     }
-    public double getDistance0(){
-        return ((double) table.getEntry("distance0").getNumber(-1.0));
+
+    public double getDistance0() {
+        return (double) table.getEntry("distance0").getNumber(-1.0);
     }
-    
-    public CANSparkMax getLeftClimber(){
+
+    public CANSparkMax getLeftClimber() {
         return climberLeft;
     }
-    
-    public CANSparkMax getRightClimber(){
+
+    public CANSparkMax getRightClimber() {
         return climberRight;
     }
 
-    
 }

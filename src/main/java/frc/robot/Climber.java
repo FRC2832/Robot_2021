@@ -3,48 +3,48 @@ package frc.robot;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.XboxController;
 
-public final class Climber{
+public final class Climber {
 
-    HoloTable table = HoloTable.getInstance();
+    private HoloTable table;
+    private CANSparkMax climberLeft;
+    private CANSparkMax climberRight;
+    private XboxController operatorGamepad;
 
-    CANSparkMax climberLeft;
-    CANSparkMax climberRight;
-
-    XboxController gamepad1;
-
-    Climber(){
-        //shooter side is "front", left is CAN2, right is CAN3
+    public Climber() {
+        table = HoloTable.getInstance();
+        // shooter side is "front", left is CAN2, right is CAN3
         climberLeft = table.getLeftClimber();
         climberRight = table.getRightClimber();
-        gamepad1 = table.getController();
+        operatorGamepad = table.getOperatorController();
     }
 
-    public void runClimb(){
-        int pov = gamepad1.getPOV();
-        if (pov == 180){
-            //down pressed
-            climberLeft.set(-.5);
-            climberRight.set(-.5);
-        }else if (pov == 270) {
-            //right pressed
-            climberLeft.set(0);
-            climberRight.set(.5);
-        }else if (pov == 90){
-            //left pressed
-            climberLeft.set(.5);
-            climberRight.set(0);
-        }else if (pov == 0){
-            //up pressed
-            climberLeft.set(1);
-            climberRight.set(1);
-        }else {
-            //nothing pressed
-            climberLeft.set(0);
-            climberRight.set(0);
+    public void runClimb() {
+        double leftSpeed;
+        double rightSpeed;
+        if (operatorGamepad.getBackButton()) { // Retract left arm.
+            leftSpeed = 0.5;
+            rightSpeed = 0.0;
+        } else if (operatorGamepad.getStartButton()) { // Retract right arm.
+            leftSpeed = 0.0;
+            rightSpeed = 0.5;
+        } else {
+            int pov = operatorGamepad.getPOV();
+            switch (pov) {
+                case 180: // Down pressed. retract both arms.
+                    leftSpeed = 1.0;
+                    rightSpeed = 1.0;
+                    break;
+                case 0: // Up pressed. Extend both arms.
+                    leftSpeed = -0.5;
+                    rightSpeed = -0.5;
+                    break;
+                default: // left, right, or nothing pressed. Move neither arm.
+                    leftSpeed = 0.0;
+                    rightSpeed = 0.0;
+                    break;
+            }
         }
+        climberLeft.set(leftSpeed);
+        climberRight.set(rightSpeed);
     }
-
-
-   
-
 }

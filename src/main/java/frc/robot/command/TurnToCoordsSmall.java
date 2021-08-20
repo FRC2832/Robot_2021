@@ -10,75 +10,69 @@ import edu.wpi.first.wpilibj.command.Command;
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-
 public class TurnToCoordsSmall extends Command {
-  double targetX, targetY;
-  NetworkTable lidarTable;
-  NetworkTableEntry lidarX, lidarY, lidarT;
-  NetworkTableInstance netInst;
-  DriveTrain m_driveTrain;
-  boolean finished = false;
-  double targetAngle;
-  int direction;
+    private double targetX, targetY;
+    private NetworkTable lidarTable;
+    private NetworkTableEntry lidarX, lidarY, lidarT;
+    private NetworkTableInstance netInst;
+    private DriveTrain driveTrain;
+    private boolean isFinished;
+    private double targetAngle;
+    private int direction;
 
-  /** Creates a new DriveToCoords. */
-  public TurnToCoordsSmall(DriveTrain driveTrain, double targetX, double targetY)  {
-    this.targetX = targetX;
-    this.targetY = targetY;
-    m_driveTrain = driveTrain;
-    //addRequirements(m_driveTrain);
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    
-    m_driveTrain.driveSpeed(0,0);
-    System.out.println("TURNING TO: " + targetX + ", " + targetY);
-    netInst = NetworkTableInstance.getDefault();
-    lidarTable = netInst.getTable("lidar");
-    lidarX = lidarTable.getEntry("x");
-    lidarY = lidarTable.getEntry("y");
-    lidarT = lidarTable.getEntry("t");
-    targetAngle = Math.toDegrees(Math.atan( (targetY - (double)lidarY.getNumber(-1))/(targetX - (double)lidarX.getNumber(-1))));
-    if((targetX - (double)lidarX.getNumber(-1) < 0)){
-      targetAngle += 180;
+    /** Creates a new DriveToCoords. */
+    public TurnToCoordsSmall(DriveTrain driveTrain, double targetX, double targetY) {
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.driveTrain = driveTrain;
+        // addRequirements(m_driveTrain);
     }
-    if (targetAngle < 0)
-      direction = 1;
-    else
-      direction = -1;
-  }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    System.out.println("TARGET ANGLE: " + targetAngle);
-    System.out.println("TURNING TO: " + targetX + ", " + targetY);
-    m_driveTrain.driveSpeed(0,direction * 0.35);
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
 
-    if(direction == -1){
-      if((((double)lidarT.getNumber(-1)) - Robot.getInitT()) >= (targetAngle)){ //Math.toDegrees(Math.atan(c1y/c1x)))
-        m_driveTrain.driveSpeed(0,0);
-        finished = true;
-      }
+        driveTrain.driveSpeed(0.0, 0.0);
+        System.out.println("TURNING TO: " + targetX + ", " + targetY);
+        netInst = NetworkTableInstance.getDefault();
+        lidarTable = netInst.getTable("lidar");
+        lidarX = lidarTable.getEntry("x");
+        lidarY = lidarTable.getEntry("y");
+        lidarT = lidarTable.getEntry("t");
+        targetAngle = Math.toDegrees(
+                Math.atan((targetY - (double) lidarY.getNumber(-1)) / (targetX - (double) lidarX.getNumber(-1))));
+        if ((targetX - (double) lidarX.getNumber(-1) < 0.0)) {
+            targetAngle += 180.0;
+        }
+        direction = -1;
+        if (targetAngle < 0.0)
+            direction *= -1;
     }
-    else{
-      if((((double)lidarT.getNumber(-1)) - Robot.getInitT()) <= (targetAngle)){ //Math.toDegrees(Math.atan(c1y/c1x)))
-        m_driveTrain.driveSpeed(0,0);
-        finished = true;
-       }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        System.out.println("TARGET ANGLE: " + targetAngle);
+        System.out.println("TURNING TO: " + targetX + ", " + targetY);
+        driveTrain.driveSpeed(0.0, direction * 0.35);
+
+        if (direction == -1 && (((double) lidarT.getNumber(-1)) - Robot.getInitT()) >= (targetAngle)) { // Math.toDegrees(Math.atan(c1y/c1x)))
+            driveTrain.driveSpeed(0.0, 0.0);
+            isFinished = true;
+        } else if ((((double) lidarT.getNumber(-1)) - Robot.getInitT()) <= (targetAngle)) { // Math.toDegrees(Math.atan(c1y/c1x)))
+            driveTrain.driveSpeed(0.0, 0.0);
+            isFinished = true;
+        }
     }
-  }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end() {
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end() {
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return finished;
-  }
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return isFinished;
+    }
 }

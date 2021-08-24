@@ -4,11 +4,11 @@ import frc.robot.*;
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class AutoShoot extends Command {
+public class RunShootWheels extends Command {
 
     private HoloTable holo;
 
-    public AutoShoot() {
+    public RunShootWheels() {
         holo = HoloTable.getInstance();
     }
 
@@ -16,14 +16,11 @@ public class AutoShoot extends Command {
     protected void execute() {
         holo.topPID.setReference(-180.0, ControlType.kVelocity);
         holo.bottomPID.setReference(180.0, ControlType.kVelocity);
-        holo.getEjector().set(0.7);
     }
 
     // Called once after isFinished returns true
     protected void end() {
-        holo.topPID.setReference(0.0, ControlType.kVelocity);
-        holo.bottomPID.setReference(0.0, ControlType.kVelocity);
-        holo.getEjector().set(0.0);
+
     }
 
     // Called when another command which requires one or more of the same

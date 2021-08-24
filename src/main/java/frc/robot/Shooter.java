@@ -103,7 +103,7 @@ public class Shooter {
             if (operatorGamepad.getAButtonPressed()) {
                 Robot.setTop = Robot.emptyTopRPM;
                 Robot.setBottom = Robot.emptyBottomRPM;
-                ejector.set(0.5);
+                ejector.set(0.7);
             }
             if (operatorGamepad.getAButtonReleased()) {
                 Robot.setTop = 0.0;

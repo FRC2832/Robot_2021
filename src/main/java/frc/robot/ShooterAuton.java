@@ -12,16 +12,20 @@ public class ShooterAuton {
     public ShooterAuton() {
         holo = HoloTable.getInstance();
         driveTrain = new DriveTrain();
-        isRobotAimed = false;
+        //isRobotAimed = false;
         msg = "";
     }
 
     public void runShooterAuton() {
         msg = "";
         if (holo.getIsDriveTrainAutonomous()) {
-            if (!isRobotAimed) {
+            Pi.processTargets();
+            msg = "driveTrainAuton";
+            if (!isRobotAimed()) {
                 msg = "aiming";
                 centerRobot();
+            } else {
+                msg = "past aiming if";
             }
             /*
             for shooting: 
@@ -35,24 +39,23 @@ public class ShooterAuton {
 
             //TODO: add setting speed to 0 at the end of this if statement?
         } else { // shooter not running
-            isRobotAimed = false; 
+            msg = "in else";
+            //isRobotAimed = false; 
         }
         SmartDashboard.putString("ShooterAuton status", msg);
     }
 
     public void centerRobot() {
         System.out.println("centering robot");
-        Pi.processTargets();
         if (Pi.getMoveLeft()) {
-            driveTrain.driveSpeed(0, 0.4); //driveSpeed() is an arcade drive method
+            driveTrain.driveSpeed(0, 0.3); //driveSpeed() is an arcade drive method
             System.out.println("turning left");
         } else if (Pi.getMoveRight()) {
-            driveTrain.driveSpeed(0, -0.4);
+            driveTrain.driveSpeed(0, -0.3);
             System.out.println("turning right");
         } else {
             driveTrain.driveSpeed(0, 0);
             System.out.println("not turning");
-            isRobotAimed = true;
             // System.out.println("move1SecDone = false");
             //if (!isFindingPowerCells)
             // move1SecDone = false;
@@ -69,6 +72,13 @@ public class ShooterAuton {
         //     autonStep++;
         // }
         // motorOld = motorNew;
+    }
+
+    public boolean isRobotAimed() {
+        if (Pi.getMoveLeft() || Pi.getMoveRight()) {
+            return false;
+        }
+        return true;
     }
 
 }

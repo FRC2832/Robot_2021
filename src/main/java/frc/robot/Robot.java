@@ -71,8 +71,8 @@ public class Robot extends TimedRobot {
         shooterAuton = new ShooterAuton();
 
         netInst = NetworkTableInstance.getDefault();
-        m_chooser.addOption("Auto Shoot", "Shoot");
-        m_chooser.setDefaultOption("Auto Nav 1", "Run Auto Nav 1");
+        m_chooser.setDefaultOption("Auto Shoot", "Shoot");
+        m_chooser.addOption("Auto Nav 1", "Run Auto Nav 1");
         m_chooser.addOption("Lidar Auto", "Lidar");
         m_chooser.addOption("Auto Nav 2", "Auto Nav 2");
         m_chooser.addOption("Auto Nav 3", "Auto Nav 3");

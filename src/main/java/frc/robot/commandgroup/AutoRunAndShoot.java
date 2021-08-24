@@ -2,7 +2,6 @@ package frc.robot.commandgroup;
 
 import frc.robot.command.*;
 import edu.wpi.first.wpilibj.command.CommandGroup;
-import edu.wpi.first.wpilibj.command.WaitCommand;
 
 public class AutoRunAndShoot extends CommandGroup {
     public double speed = 51.0; // inches per second for linear speed of wheels
@@ -12,7 +11,7 @@ public class AutoRunAndShoot extends CommandGroup {
     public AutoRunAndShoot() {
         // addSequential(new AutoRun(51.0),120/AutoPath.speed);
         addSequential(new AutoRun(rpm, 2.0), 12.0 / speed);
-        addSequential(new WaitCommand(1.0));
-        addSequential(new AutoShoot(), 3.0);
+        addSequential(new RunShootWheels(), 1.0);
+        addSequential(new AutoShoot(), 4.0);
     }
 }

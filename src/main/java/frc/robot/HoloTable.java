@@ -57,6 +57,8 @@ public final class HoloTable {
 
     private NetworkTable table;
 
+    private boolean isDriveTrainAutonomous;
+
     public HoloTable() {
         // driveTurn = new WPI_TalonSRX(0);
         gyro = new PigeonIMU(new WPI_TalonSRX(11));
@@ -205,4 +207,11 @@ public final class HoloTable {
         return climberRight;
     }
 
+    public boolean getIsDriveTrainAutonomous() {
+        return isDriveTrainAutonomous;
+    }
+
+    public void setIsDriveTrainAutonomous(boolean isDriveAuton) {
+        isDriveTrainAutonomous = isDriveAuton;
+    }
 }

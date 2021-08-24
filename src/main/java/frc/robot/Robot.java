@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
     private Climber climber;
     private CameraServer camServer;
     private PigeonIMU gyro;
+    private ShooterAuton shooterAuton;
 
     private Pi pi;
     private String m_autoSelected;
@@ -67,10 +68,11 @@ public class Robot extends TimedRobot {
         gyro = holo.getGyro();
         gyro.setYaw(0.0);
         yaw = new double[3];
+        shooterAuton = new ShooterAuton();
 
         netInst = NetworkTableInstance.getDefault();
-        m_chooser.addOption("Auto Shoot", "Shoot");
-        m_chooser.setDefaultOption("Auto Nav 1", "Run Auto Nav 1");
+        m_chooser.setDefaultOption("Auto Shoot", "Shoot");
+        m_chooser.addOption("Auto Nav 1", "Run Auto Nav 1");
         m_chooser.addOption("Lidar Auto", "Lidar");
         m_chooser.addOption("Auto Nav 2", "Auto Nav 2");
         m_chooser.addOption("Auto Nav 3", "Auto Nav 3");
@@ -150,9 +152,9 @@ public class Robot extends TimedRobot {
         driveTrain = new DriveTrain();
         camServer = CameraServer.getInstance();
         camServer.addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
-        camServer.startAutomaticCapture(0);
+        //camServer.startAutomaticCapture(0);
         //camServer.startAutomaticCapture(1);
-        camServer.getServer();
+        //camServer.getServer();
     }
 
     /**
@@ -270,13 +272,15 @@ public class Robot extends TimedRobot {
             e.printStackTrace();
         }
 
-        driveTrain.driveTank();
+        driveTrain.runDriveTrain();
         // driveTrain.driveTankcbrt();
         // driveTrain.driveTankcube();
         //driveTrain.driveArcade();
         // driveTrain.driveArcadecbrt();
         // driveTrain.driveArcadecube();
         pi.switchCameras();
+
+        shooterAuton.runShooterAuton();
 
         /*
          * if (gamepad1.getXButtonPressed()) { cameraSelect.setDouble(2); }

@@ -28,7 +28,6 @@ public class Ingestor {
          * (controller.getTriggerAxis(Hand.kRight) == 1) { intake.set(-0.9); } else {
          * intake.set(0.0); }
          */
-
         if (holoTable.getIsDriveTrainAutonomous()) {
 
         } else {

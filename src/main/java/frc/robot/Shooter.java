@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -81,8 +82,8 @@ public class Shooter {
                 // mult = shTable.getMultiplier(holo.getDistance0());
                 // shootSpeed = 255.0 * mult;
                 
-                var tSpeed = table.getEntry("Top Target").getDouble(215);
-                var bSpeed = table.getEntry("Bottom Target").getDouble(180);
+                double tSpeed = table.getEntry("Top Target").getDouble(215);
+                double bSpeed = table.getEntry("Bottom Target").getDouble(180);
                 holo.topPID.setReference(-tSpeed, ControlType.kVelocity);
                 holo.bottomPID.setReference(bSpeed, ControlType.kVelocity);
 
@@ -112,8 +113,8 @@ public class Shooter {
             }
         }
 
-        var mTop = holo.getTopShooter();
-        var mBot = holo.getBottomShooter();
+        CANSparkMax mTop = holo.getTopShooter();
+        CANSparkMax mBot = holo.getBottomShooter();
         table.getEntry("Top Velocity").setDouble(mTop.getEncoder().getVelocity());
         table.getEntry("Top Output%").setDouble(mTop.getAppliedOutput());
         table.getEntry("Top Current").setDouble(mTop.getOutputCurrent());

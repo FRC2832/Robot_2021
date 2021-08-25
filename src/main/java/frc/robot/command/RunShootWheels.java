@@ -14,8 +14,8 @@ public class RunShootWheels extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        holo.topPID.setReference(-180.0, ControlType.kVelocity);
-        holo.bottomPID.setReference(180.0, ControlType.kVelocity);
+        holo.topPID.setReference(-140.0, ControlType.kVelocity);
+        holo.bottomPID.setReference(190.0, ControlType.kVelocity);
     }
 
     // Called once after isFinished returns true

@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
     private CameraServer camServer;
     private PigeonIMU gyro;
     private ShooterAuton shooterAuton;
+    private ColorWheel colorWheel;
 
     private Pi pi;
     private String m_autoSelected;
@@ -69,6 +70,7 @@ public class Robot extends TimedRobot {
         gyro.setYaw(0.0);
         yaw = new double[3];
         shooterAuton = new ShooterAuton();
+        colorWheel = new ColorWheel();
 
         netInst = NetworkTableInstance.getDefault();
         m_chooser.setDefaultOption("Auto Shoot", "Shoot");
@@ -273,26 +275,11 @@ public class Robot extends TimedRobot {
         }
 
         driveTrain.runDriveTrain();
-        // driveTrain.driveTankcbrt();
-        // driveTrain.driveTankcube();
-        //driveTrain.driveArcade();
-        // driveTrain.driveArcadecbrt();
-        // driveTrain.driveArcadecube();
+        colorWheel.periodic();
         pi.switchCameras();
 
+        //must be last to overwrite all the subsystems with shooting commands!!!
         shooterAuton.runShooterAuton();
-
-        /*
-         * if (gamepad1.getXButtonPressed()) { cameraSelect.setDouble(2); }
-         */
-        /*
-         * if (isCamValueUpdated) { if ((int) cameraSelect.getNumber(-1.0) == 0)
-         * System.out.println("SUCCESSFULLY WROTE 0.0 TO NETWORK TABLE"); else if ((int)
-         * cameraSelect.getNumber(-1.0) == 1)
-         * System.out.println("SUCCESSFULLY WROTE 1.0 TO NETWORK TABLE");
-         * isCamValueUpdated = false; }
-         */
-
     }
 
     /**

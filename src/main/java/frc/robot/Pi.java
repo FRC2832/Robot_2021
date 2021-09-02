@@ -13,9 +13,7 @@ public final class Pi {
     private NetworkTable table;
     private NetworkTableEntry cameraSelect;
     private static NetworkTableEntry targetCenterX;
-    private static boolean hasFoundObjective;
-    private static boolean moveLeft;
-    private static boolean moveRight;
+    private static double moveTurn;
     private static final int CAM_X_RES = 640;
     private static final int CAM_Y_RES = 480;
     private static final int CENTERPOINT = 348; //when shooter is centered instead of camera
@@ -29,6 +27,7 @@ public final class Pi {
         targetCenterX = table.getEntry("targetX");
         cameraSelect = netInst.getTable("SmartDashboard").getEntry("camNumber");
         CameraServer.getInstance().addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
+        moveTurn = 0;
     }
 
     public void switchCameras() {
@@ -44,32 +43,24 @@ public final class Pi {
     public static void processTargets() {
         Number[] targetCenterArray = targetCenterX.getNumberArray(new Number[0]);
         if (targetCenterArray.length == 0) {
-            hasFoundObjective = false;
-            moveRight = false;
-            moveLeft = false;
+            moveTurn = 0;
             return;
         }
-        hasFoundObjective = true; //TODO: do we need this boolean?
         double targetX = (double) targetCenterArray[targetCenterArray.length - 1]; // rightmost target
-        // System.out.println("target x value: " + targetX);
-        if (targetX < CENTERPOINT - (CAM_X_RES * 0.025)) {
-            moveRight = false;
-            moveLeft = true;
-        } else if (targetX > CENTERPOINT + (CAM_X_RES * 0.025)) {
-            moveLeft = false;
-            moveRight = true;
+        
+        //~348 is center of target.  85 is when we are parallel to wall, and need to turn left
+        double diff = CENTERPOINT-targetX;
+        double error = CAM_X_RES * 0.025;
+        if(Math.abs(diff) < error) {
+            moveTurn = 0;
         } else {
-            moveRight = false;
-            moveLeft = false;
+            //we want a speed of 0.45 when off by 263 (348-85), and a speed of 0.25 at 16 pixels off 
+            //that means, start with 25% power, and add more the further we are off
+            moveTurn = Math.signum(diff) * (0.25 + (0.2*(Math.abs(diff)-16)/263));
         }
     }
 
-    public static boolean getMoveLeft() {
-        return moveLeft;
+    public static double getMove() {
+        return moveTurn;
     }
-
-    public static boolean getMoveRight() {
-        return moveRight;
-    }
-
 }

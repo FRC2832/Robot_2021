@@ -8,6 +8,7 @@ package frc.robot;
 /*----------------------------------------------------------------------------*/
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -95,5 +96,20 @@ public class DriveTrain extends SubsystemBase {
             holo.setIsDriveTrainAutonomous(false);
             driveTank();
         }
+    }
+
+    public void setBrakeMode(boolean brake) {
+        IdleMode mode;
+
+        if (brake == true) {
+            mode = IdleMode.kBrake;
+        } else {
+            mode = IdleMode.kCoast;
+        }
+
+        leftFront.setIdleMode(mode);
+        rightFront.setIdleMode(mode);
+        leftRear.setIdleMode(mode);
+        rightRear.setIdleMode(mode);
     }
 }

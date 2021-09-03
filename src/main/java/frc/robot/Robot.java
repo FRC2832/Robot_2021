@@ -186,6 +186,12 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean("Hopper Intake", holo.getInfraredIntake().get());
     }
 
+    @Override
+    public void disabledInit() {
+        //whenever the robot enters disabled, put motors in coast mode
+        driveTrain.setBrakeMode(false);
+    }
+
     /**
      * This autonomous (along with the chooser code above) shows how to select
      * between different autonomous modes using the dashboard. The sendable chooser
@@ -200,6 +206,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
+        driveTrain.setBrakeMode(true);
         Scheduler.getInstance().removeAll();
         // new GridAuto(driveTrain);
         gyro.setYaw(0.0);
@@ -252,6 +259,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        driveTrain.setBrakeMode(true);
         Scheduler.getInstance().removeAll();
         initX = ((double) lidarX.getNumber(-1));
         initY = ((double) lidarY.getNumber(-1));

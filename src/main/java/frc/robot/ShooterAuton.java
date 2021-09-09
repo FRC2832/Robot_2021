@@ -66,20 +66,11 @@ public class ShooterAuton {
 
     public void centerRobot() {
         System.out.println("centering robot");
-        if (Pi.getMoveLeft()) {
-            driveTrain.driveSpeed(0, 0.3); //driveSpeed() is an arcade drive method
-            //System.out.println("turning left");
-        } else if (Pi.getMoveRight()) {
-            driveTrain.driveSpeed(0, -0.3);
-            //System.out.println("turning right");
-        } else {
-            driveTrain.driveSpeed(0, 0);
-            //System.out.println("not turning");
-        }
+        driveTrain.driveSpeed(0, Pi.getMove()); //driveSpeed() is an arcade drive method
     }
 
     public boolean isRobotAimed() {
-        if (Pi.getMoveLeft() || Pi.getMoveRight()) {
+        if (Math.abs(Pi.getMove())>0.1) {
             return false;
         }
         return true;

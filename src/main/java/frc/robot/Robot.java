@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
     private CameraServer camServer;
     private PigeonIMU gyro;
     private ShooterAuton shooterAuton;
+    private ColorWheel colorWheel;
 
     private Pi pi;
     private String m_autoSelected;
@@ -69,6 +70,7 @@ public class Robot extends TimedRobot {
         gyro.setYaw(0.0);
         yaw = new double[3];
         shooterAuton = new ShooterAuton();
+        colorWheel = new ColorWheel();
 
         netInst = NetworkTableInstance.getDefault();
         m_chooser.setDefaultOption("Auto Shoot", "Shoot");
@@ -184,6 +186,12 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean("Hopper Intake", holo.getInfraredIntake().get());
     }
 
+    @Override
+    public void disabledInit() {
+        //whenever the robot enters disabled, put motors in coast mode
+        driveTrain.setBrakeMode(false);
+    }
+
     /**
      * This autonomous (along with the chooser code above) shows how to select
      * between different autonomous modes using the dashboard. The sendable chooser
@@ -198,6 +206,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
+        driveTrain.setBrakeMode(true);
         Scheduler.getInstance().removeAll();
         // new GridAuto(driveTrain);
         gyro.setYaw(0.0);
@@ -250,6 +259,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        driveTrain.setBrakeMode(true);
         Scheduler.getInstance().removeAll();
         initX = ((double) lidarX.getNumber(-1));
         initY = ((double) lidarY.getNumber(-1));
@@ -273,26 +283,11 @@ public class Robot extends TimedRobot {
         }
 
         driveTrain.runDriveTrain();
-        // driveTrain.driveTankcbrt();
-        // driveTrain.driveTankcube();
-        //driveTrain.driveArcade();
-        // driveTrain.driveArcadecbrt();
-        // driveTrain.driveArcadecube();
+        colorWheel.periodic();
         pi.switchCameras();
 
+        //must be last to overwrite all the subsystems with shooting commands!!!
         shooterAuton.runShooterAuton();
-
-        /*
-         * if (gamepad1.getXButtonPressed()) { cameraSelect.setDouble(2); }
-         */
-        /*
-         * if (isCamValueUpdated) { if ((int) cameraSelect.getNumber(-1.0) == 0)
-         * System.out.println("SUCCESSFULLY WROTE 0.0 TO NETWORK TABLE"); else if ((int)
-         * cameraSelect.getNumber(-1.0) == 1)
-         * System.out.println("SUCCESSFULLY WROTE 1.0 TO NETWORK TABLE");
-         * isCamValueUpdated = false; }
-         */
-
     }
 
     /**

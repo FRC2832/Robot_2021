@@ -40,20 +40,8 @@ public final class Hopper {
             // if b is pressed, run the hopper backwards to stop jams
             hopperSpeed = 0.4;
         } else if (operatorGamepad.getBumper(Hand.kRight)) {
-            // if right bumper pressed, intake unless hopper sensor think full
-            if (!infraredIntake.get()) {
-                if (!infraredHopper1.get()) {
-                    if (!infraredHopper2.get()) {
-                        hopperSpeed = 0.0;
-                    } else {
-                        hopperSpeed = -0.5;
-                    }
-                } else {
-                    hopperSpeed = -0.5;
-                }
-            } else {
-                hopperSpeed = 0.0;
-            }
+            // if right bumper pressed, removed sensor detection
+            hopperSpeed = -0.5;
         } else {
             // no controller pressed, do nothing
             hopperSpeed = 0.0;

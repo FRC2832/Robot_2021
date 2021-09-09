@@ -647,8 +647,8 @@ def extra_power_cell_processing(pipeline):
         #    continue
         center_x_positions.append(x + w / 2)
         center_y_positions.append(y + (h / 2))
-    print('center power cell x', center_x_positions)
-    print('center power cell y', center_y_positions)
+    #print('center power cell x', center_x_positions)
+    #print('center power cell y', center_y_positions)
     # Publish to the '/vision/red_areas' network table
     table = NetworkTables.getTable('datatable')
     table.putNumberArray('powerCellX', center_x_positions)
@@ -661,17 +661,36 @@ def extra_target_processing(pipeline):
         :return: None
         """
     center_x_positions = []
-
+    widths = []
+    box_widths = []
     # Find the bounding boxes of the contours to get x, y, width, and height
     # print("all filtered contours:" +str(pipeline.filter_contours_output))
     for contour in pipeline.filter_contours_output:
         x, y, w, h = cv2.boundingRect(contour)
         center_x_positions.append(x + w / 2)
+        box_widths.append(w)
+
+        minHeight = y + 0.8 * h  # we want the bottom of the shape
+        left = 9999
+        right = 0
+        for point in contour:
+            if len(point) == 2 and point[1] > minHeight:
+                if left > point[0]:
+                    left = point[0]
+                if right < point[0]:
+                    right = point[0]
+        width = right - left
+        if (width > 0):
+            widths.append(right - left)
+        else:
+            widths.append(0)
+
     print('center target x', center_x_positions)
     # Publish to the '/vision/red_areas' network table
     table = NetworkTables.getTable('datatable')
     table.putNumberArray('targetX', center_x_positions)
-
+    table.putNumberArray('widthX', widths)
+    table.putNumberArray('widthBox', box_widths)
 
 
 

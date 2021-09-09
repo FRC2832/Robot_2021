@@ -33,11 +33,15 @@ public final class Climber {
         } else {
             int pov = operatorGamepad.getPOV();
             switch (pov) {
-                case 180: // Down pressed. retract both arms.
+                case 180: // Down or diagonal of down pressed. retract both arms.
+                case 135:
+                case 225:
                     leftSpeed = 1.0;
                     rightSpeed = 1.0;
                     break;
                 case 0: // Up pressed. Extend both arms.
+                case 45:
+                case 315:
                     leftSpeed = -0.5;
                     rightSpeed = -0.5;
                     break;

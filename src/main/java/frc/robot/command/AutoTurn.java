@@ -16,7 +16,7 @@ public class AutoTurn extends Command {
     public AutoTurn(double commandAngle) {
         table = HoloTable.getInstance();
         gyro = table.getGyro();
-        driveTrain = Robot.driveTrain;
+        driveTrain = Robot.getDriveTrain();
         this.commandAngle = commandAngle;
         isFinished = false;
     }

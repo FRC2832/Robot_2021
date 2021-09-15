@@ -18,7 +18,7 @@ public class ShooterAuton {
     
     public ShooterAuton() {
         holo = HoloTable.getInstance();
-        driveTrain = Robot.driveTrain;
+        driveTrain = Robot.getDriveTrain();
         hopper = holo.getHopper();
         ejector = holo.getEjector();
         choices = new ArrayList<ShotChoice>();

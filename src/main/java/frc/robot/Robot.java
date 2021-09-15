@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
     private final SendableChooser<String> m_chooser = new SendableChooser<>();
     public static double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, fastTopRPM, fastBottomRPM, emptyTopRPM,
             emptyBottomRPM, setTop, setBottom;
-    public static DriveTrain driveTrain;
+    private static DriveTrain driveTrain;
     private NetworkTableInstance netInst;
     private NetworkTable lidarTable;
     private NetworkTableEntry lidarX, lidarY, lidarT;
@@ -310,4 +310,7 @@ public class Robot extends TimedRobot {
         return initT;
     }
 
+    public static DriveTrain getDriveTrain() {
+        return driveTrain;
+    }
 }

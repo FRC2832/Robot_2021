@@ -13,5 +13,8 @@ public class AutoRunAndShoot extends CommandGroup {
         addSequential(new AutoRun(rpm, 2.0), 12.0 / speed);
         addSequential(new RunShootWheels(), 1.0);
         addSequential(new AutoShoot(), 4.0);
+        //after shooting, turn back to center and go
+        addSequential(new AutoTurn(40),3);
+        addSequential(new AutoRun(rpm, 2.0), 1.2);
     }
 }

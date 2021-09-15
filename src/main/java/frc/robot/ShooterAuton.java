@@ -15,10 +15,10 @@ public class ShooterAuton {
     private WPI_TalonSRX hopper;
     private WPI_TalonSRX ejector;
     private ArrayList<ShotChoice> choices;
-
+    
     public ShooterAuton() {
         holo = HoloTable.getInstance();
-        driveTrain = new DriveTrain();
+        driveTrain = Robot.getDriveTrain();
         hopper = holo.getHopper();
         ejector = holo.getEjector();
         choices = new ArrayList<ShotChoice>();
@@ -66,7 +66,18 @@ public class ShooterAuton {
 
     public void centerRobot() {
         System.out.println("centering robot");
-        driveTrain.driveSpeed(0, Pi.getMove()); //driveSpeed() is an arcade drive method
+        double speed = Pi.getMove();
+
+        //neuter the variable turn request
+        if(speed > 0.1) {
+            speed = 0.36;
+        } else if (speed < -0.1) {
+            speed = -0.36;
+        } else {
+            speed = 0;
+        }
+
+        driveTrain.driveSpeed(0, speed); //driveSpeed() is an arcade drive method
     }
 
     public boolean isRobotAimed() {

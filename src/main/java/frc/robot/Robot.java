@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
     private final SendableChooser<String> m_chooser = new SendableChooser<>();
     public static double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, fastTopRPM, fastBottomRPM, emptyTopRPM,
             emptyBottomRPM, setTop, setBottom;
-    public static DriveTrain driveTrain;
+    private static DriveTrain driveTrain;
     private NetworkTableInstance netInst;
     private NetworkTable lidarTable;
     private NetworkTableEntry lidarX, lidarY, lidarT;
@@ -60,6 +60,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotInit() {
+        driveTrain = new DriveTrain();
         shooter = new Shooter();
         ingestor = new Ingestor();
         hopper = new Hopper();
@@ -151,7 +152,6 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Max Output", kMaxOutput);
         SmartDashboard.putNumber("Min Output", kMinOutput);
 
-        driveTrain = new DriveTrain();
         camServer = CameraServer.getInstance();
         camServer.addServer("10.28.32.4"); // I think this connects to the Raspberry Pi's CameraServer.
         //camServer.startAutomaticCapture(0);
@@ -310,4 +310,7 @@ public class Robot extends TimedRobot {
         return initT;
     }
 
+    public static DriveTrain getDriveTrain() {
+        return driveTrain;
+    }
 }

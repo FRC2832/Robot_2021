@@ -51,7 +51,7 @@ public class DriveTrain extends SubsystemBase {
     }
 
     public void driveTank() {
-        differentialDrive.tankDrive(driverController.getY(Hand.kLeft) * 0.5, driverController.getY(Hand.kRight) * 0.5, false);
+        differentialDrive.tankDrive(driverController.getY(Hand.kLeft) * 0.7, driverController.getY(Hand.kRight) * 0.7, false);
     }
 
     public void driveTankcbrt() {

@@ -68,15 +68,6 @@ public class ShooterAuton {
         System.out.println("centering robot");
         double speed = Pi.getMove();
 
-        //neuter the variable turn request
-        if(speed > 0.1) {
-            speed = 0.36;
-        } else if (speed < -0.1) {
-            speed = -0.36;
-        } else {
-            speed = 0;
-        }
-
         driveTrain.driveSpeed(0, speed); //driveSpeed() is an arcade drive method
     }
 

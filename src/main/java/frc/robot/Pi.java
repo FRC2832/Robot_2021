@@ -16,7 +16,7 @@ public final class Pi {
     private static double moveTurn;
     private static final int CAM_X_RES = 640;
     private static final int CAM_Y_RES = 480;
-    private static final int CENTERPOINT = 348; //when shooter is centered instead of camera
+    private static final int CENTERPOINT = 315; //when shooter is centered instead of camera
 
     
     public Pi() {
@@ -56,6 +56,7 @@ public final class Pi {
         } else {
             //we want a speed of 0.45 when off by 263 (348-85), and a speed of 0.25 at 16 pixels off 
             //that means, start with 25% power, and add more the further we are off
+            //if battery is relatively low, use 30%
             moveTurn = Math.signum(diff) * (0.25 + (0.2*(Math.abs(diff)-16)/263));
         }
     }
